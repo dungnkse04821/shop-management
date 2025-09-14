@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShopManagement.Entity;
+using System.Reflection.Emit;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -24,6 +26,17 @@ public class ShopManagementDbContext :
     ITenantManagementDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
+
+    public DbSet<User> Users { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<ProductVariant> ProductVariants { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Shipment> Shipments { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
+
 
     #region Entities from the modules
 
@@ -82,5 +95,28 @@ public class ShopManagementDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+        // Unique index cho SKU
+        builder.Entity<Product>()
+            .HasIndex(p => p.Sku)
+            .IsUnique();
+
+        // Quan hệ 1-nhiều: Order - OrderItem
+        builder.Entity<Order>()
+            .HasMany(o => o.Items)
+            .WithOne(i => i.Order)
+            .HasForeignKey(i => i.OrderId);
+
+        // Quan hệ 1-1: Order - Shipment
+        builder.Entity<Order>()
+            .HasOne(o => o.Shipment)
+            .WithOne(s => s.Order)
+            .HasForeignKey<Shipment>(s => s.OrderId);
+
+        // Quan hệ 1-1: Order - Invoice
+        builder.Entity<Order>()
+            .HasOne(o => o.Invoice)
+            .WithOne(i => i.Order)
+            .HasForeignKey<Invoice>(i => i.OrderId);
     }
 }
