@@ -27,7 +27,7 @@ public class ShopManagementDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
-    public DbSet<User> Users { get; set; }
+    public DbSet<User> ShopUsers { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
@@ -72,51 +72,191 @@ public class ShopManagementDbContext :
 
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
-        /* Include modules to your migration db context */
+        modelBuilder.ConfigurePermissionManagement();
+        modelBuilder.ConfigureSettingManagement();
+        modelBuilder.ConfigureBackgroundJobs();
+        modelBuilder.ConfigureAuditLogging();
+        modelBuilder.ConfigureIdentity();
+        modelBuilder.ConfigureOpenIddict();
+        modelBuilder.ConfigureFeatureManagement();
+        modelBuilder.ConfigureTenantManagement();
 
-        builder.ConfigurePermissionManagement();
-        builder.ConfigureSettingManagement();
-        builder.ConfigureBackgroundJobs();
-        builder.ConfigureAuditLogging();
-        builder.ConfigureIdentity();
-        builder.ConfigureOpenIddict();
-        builder.ConfigureFeatureManagement();
-        builder.ConfigureTenantManagement();
+        modelBuilder.Entity<Product>(b =>
+        {
+            b.ToTable("Products");
 
-        /* Configure your own tables/entities inside here */
+            b.HasKey(p => p.Id);
 
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(ShopManagementConsts.DbTablePrefix + "YourEntities", ShopManagementConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+            b.Property(p => p.Sku).IsRequired().HasMaxLength(50);
+            b.Property(p => p.Name).IsRequired().HasMaxLength(200);
+            b.Property(p => p.Description).HasMaxLength(1000);
+            b.Property(p => p.PriceBuy).HasColumnType("decimal(18,2)");
+            b.Property(p => p.PriceSell).HasColumnType("decimal(18,2)");
+            b.Property(p => p.ImageUrl).HasMaxLength(500);
 
-        // Unique index cho SKU
-        builder.Entity<Product>()
-            .HasIndex(p => p.Sku)
-            .IsUnique();
+            b.Property(p => p.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            b.Property(p => p.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
 
-        // Quan hệ 1-nhiều: Order - OrderItem
-        builder.Entity<Order>()
-            .HasMany(o => o.Items)
-            .WithOne(i => i.Order)
-            .HasForeignKey(i => i.OrderId);
+            // Quan hệ 1-n với ProductVariant
+            b.HasMany(p => p.Variants)
+             .WithOne(v => v.Product)
+             .HasForeignKey(v => v.ProductId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        // Quan hệ 1-1: Order - Shipment
-        builder.Entity<Order>()
-            .HasOne(o => o.Shipment)
-            .WithOne(s => s.Order)
-            .HasForeignKey<Shipment>(s => s.OrderId);
+        modelBuilder.Entity<ProductVariant>(b =>
+        {
+            b.ToTable("ProductVariants");
 
-        // Quan hệ 1-1: Order - Invoice
-        builder.Entity<Order>()
-            .HasOne(o => o.Invoice)
-            .WithOne(i => i.Order)
-            .HasForeignKey<Invoice>(i => i.OrderId);
+            b.HasKey(v => v.Id);
+
+            b.Property(v => v.VariantName).IsRequired().HasMaxLength(100);
+            b.Property(v => v.Sku).IsRequired().HasMaxLength(50);
+            b.Property(v => v.Stock).IsRequired();
+        });
+
+        // ===================== Order =====================
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Orders");
+
+            entity.HasKey(o => o.Id);
+
+            entity.Property(o => o.Status)
+                  .IsRequired()
+                  .HasMaxLength(50)
+                  .HasDefaultValue("New");
+
+            entity.Property(o => o.Source)
+                  .HasMaxLength(100);
+
+            entity.Property(o => o.Note)
+                  .HasMaxLength(500);
+
+            entity.Property(o => o.TotalAmount)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(o => o.CreatedAt)
+                  .HasDefaultValueSql("GETUTCDATE()");
+
+            entity.Property(o => o.UpdatedAt)
+                  .HasDefaultValueSql("GETUTCDATE()");
+        });
+
+        // ===================== OrderItem =====================
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.ToTable("OrderItems");
+
+            entity.HasKey(oi => oi.Id);
+
+            entity.Property(oi => oi.Price)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(oi => oi.Quantity)
+                  .IsRequired();
+
+            entity.HasOne(oi => oi.Order)
+                  .WithMany(o => o.Items)
+                  .HasForeignKey(oi => oi.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(oi => oi.ProductVariant)
+                  .WithMany()
+                  .HasForeignKey(oi => oi.ProductVariantId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ===================== Payment =====================
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.ToTable("Payments");
+
+            entity.HasKey(p => p.Id);
+
+            entity.Property(p => p.Amount)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(p => p.Method)
+                  .IsRequired()
+                  .HasMaxLength(50);
+
+            entity.Property(p => p.Status)
+                  .IsRequired()
+                  .HasMaxLength(50);
+
+            entity.Property(p => p.CreatedAt)
+                  .HasDefaultValueSql("GETUTCDATE()");
+
+            entity.HasOne(p => p.Order)
+                  .WithMany(o => o.Payments)
+                  .HasForeignKey(p => p.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===================== Invoice =====================
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.ToTable("Invoices");
+
+            entity.HasKey(i => i.Id);
+
+            entity.Property(i => i.InvoiceNumber)
+                  .IsRequired()
+                  .HasMaxLength(100);
+
+            entity.Property(i => i.PdfUrl)
+                  .HasMaxLength(500);
+
+            entity.Property(i => i.TotalAmount)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(i => i.IssuedAt)
+                  .IsRequired();
+
+            entity.HasOne(i => i.Order)
+                  .WithOne(o => o.Invoice)
+                  .HasForeignKey<Invoice>(i => i.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===================== Shipment =====================
+        modelBuilder.Entity<Shipment>(entity =>
+        {
+            entity.ToTable("Shipments");
+
+            entity.HasKey(s => s.Id);
+
+            entity.Property(s => s.Carrier)
+                  .IsRequired()
+                  .HasMaxLength(100);
+
+            entity.Property(s => s.TrackingNumber)
+                  .IsRequired()
+                  .HasMaxLength(200);
+
+            entity.Property(s => s.Status)
+                  .IsRequired()
+                  .HasMaxLength(50)
+                  .HasDefaultValue("Created");
+
+            entity.Property(s => s.ServiceCode)
+                  .HasMaxLength(100);
+
+            entity.Property(s => s.CodAmount)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(s => s.CreatedAt)
+                  .HasDefaultValueSql("GETUTCDATE()");
+
+            entity.HasOne(s => s.Order)
+                  .WithOne(o => o.Shipment)
+                  .HasForeignKey<Shipment>(s => s.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

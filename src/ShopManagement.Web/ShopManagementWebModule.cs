@@ -1,16 +1,16 @@
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using OpenIddict.Validation.AspNetCore;
 using ShopManagement.EntityFrameworkCore;
 using ShopManagement.Localization;
 using ShopManagement.MultiTenancy;
 using ShopManagement.Web.Menus;
-using Microsoft.OpenApi.Models;
-using OpenIddict.Validation.AspNetCore;
+using System.IO;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Mvc;
@@ -25,19 +25,21 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.Data;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
+using Volo.Abp.OpenIddict;
 using Volo.Abp.PermissionManagement.Web;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.SettingManagement.Web;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.TenantManagement.Web;
-using Volo.Abp.OpenIddict;
-using Volo.Abp.UI.Navigation.Urls;
+using Volo.Abp.Threading;
 using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
+using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 
 namespace ShopManagement.Web;
@@ -199,6 +201,12 @@ public class ShopManagementWebModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
+
+        AsyncHelper.RunSync(async () =>
+        {
+            var dataSeeder = context.ServiceProvider.GetRequiredService<IDataSeeder>();
+            await dataSeeder.SeedAsync();
+        });
 
         if (env.IsDevelopment())
         {

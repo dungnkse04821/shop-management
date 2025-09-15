@@ -20,7 +20,24 @@ namespace ShopManagement.Entity
         public DateTime UpdatedAt { get; set; }
 
         // Relationships
-        public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+        public List<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+
+        protected Product() { } // EF Core cần constructor này
+
+        public Product(string sku, string name, string description,
+                       decimal priceBuy, decimal priceSell, string imageUrl)
+        {
+            Id = Guid.NewGuid();
+            Sku = sku;
+            Name = name;
+            Description = description;
+            PriceBuy = priceBuy;
+            PriceSell = priceSell;
+            ImageUrl = imageUrl;
+            CreatedAt = DateTime.Now;
+            UpdatedAt = DateTime.Now;
+            Variants = new List<ProductVariant>();
+        }
     }
 
     public class ProductVariant : Entity<Guid>
@@ -31,6 +48,17 @@ namespace ShopManagement.Entity
 
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
+
+        protected ProductVariant() { }
+
+        public ProductVariant(string variantName, string sku, int stock, Guid productId)
+        {
+            Id = Guid.NewGuid();
+            VariantName = variantName;
+            Sku = sku;
+            Stock = stock;
+            ProductId = productId;
+        }
     }
 
 }

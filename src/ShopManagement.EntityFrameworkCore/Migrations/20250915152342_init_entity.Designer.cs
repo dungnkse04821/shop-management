@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopManagement.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace ShopManagement.Migrations
 {
     [DbContext(typeof(ShopManagementDbContext))]
-    partial class ShopManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250915152342_init_entity")]
+    partial class init_entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,6 +48,7 @@ namespace ShopManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
@@ -66,8 +70,7 @@ namespace ShopManagement.Migrations
 
                     b.Property<string>("InvoiceNumber")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("IssuedAt")
                         .HasColumnType("datetime2");
@@ -77,18 +80,14 @@ namespace ShopManagement.Migrations
 
                     b.Property<string>("PdfUrl")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.Order", b =>
@@ -97,42 +96,34 @@ namespace ShopManagement.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Source")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("New");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.OrderItem", b =>
@@ -158,7 +149,7 @@ namespace ShopManagement.Migrations
 
                     b.HasIndex("ProductVariantId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.Payment", b =>
@@ -170,14 +161,11 @@ namespace ShopManagement.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Method")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -187,14 +175,13 @@ namespace ShopManagement.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.Product", b =>
@@ -203,24 +190,19 @@ namespace ShopManagement.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PriceBuy")
                         .HasColumnType("decimal(18,2)");
@@ -230,17 +212,17 @@ namespace ShopManagement.Migrations
 
                     b.Property<string>("Sku")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.HasIndex("Sku")
+                        .IsUnique();
+
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.ProductVariant", b =>
@@ -253,22 +235,20 @@ namespace ShopManagement.Migrations
 
                     b.Property<string>("Sku")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.Property<string>("VariantName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductVariants", (string)null);
+                    b.ToTable("ProductVariants");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.Shipment", b =>
@@ -278,16 +258,7 @@ namespace ShopManagement.Migrations
 
                     b.Property<string>("Carrier")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal?>("CodAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("datetime2");
@@ -295,34 +266,23 @@ namespace ShopManagement.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ReturnedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ServiceCode")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime?>("ShippedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("Created");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Shipments", (string)null);
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.User", b =>
@@ -2186,7 +2146,7 @@ namespace ShopManagement.Migrations
                     b.HasOne("ShopManagement.Entity.ProductVariant", "ProductVariant")
                         .WithMany()
                         .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
@@ -2376,13 +2336,15 @@ namespace ShopManagement.Migrations
 
             modelBuilder.Entity("ShopManagement.Entity.Order", b =>
                 {
-                    b.Navigation("Invoice");
+                    b.Navigation("Invoice")
+                        .IsRequired();
 
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
 
-                    b.Navigation("Shipment");
+                    b.Navigation("Shipment")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.Product", b =>
