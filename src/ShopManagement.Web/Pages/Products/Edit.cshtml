@@ -1,0 +1,94 @@
+﻿@page "{id:guid}"
+@model ShopManagement.Web.Pages.Products.EditModel
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h2>Edit Product</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="ViewModel.Id" />
+
+    <div class="form-group">
+        <label asp-for="ViewModel.Product.Sku"></label>
+        <input asp-for="ViewModel.Product.Sku" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ViewModel.Product.Name"></label>
+        <input asp-for="ViewModel.Product.Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ViewModel.Product.Description"></label>
+        <textarea asp-for="ViewModel.Product.Description" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label asp-for="ViewModel.Product.PriceBuy"></label>
+        <input asp-for="ViewModel.Product.PriceBuy" class="form-control" type="number" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ViewModel.Product.PriceSell"></label>
+        <input asp-for="ViewModel.Product.PriceSell" class="form-control" type="number" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ViewModel.Product.ImageUrl"></label>
+        <input asp-for="ViewModel.Product.ImageUrl" class="form-control" />
+    </div>
+
+    <h4>Variants</h4>
+    <table class="table" id="variantsTable">
+        <thead>
+            <tr>
+                <th>Variant Name</th>
+                <th>SKU</th>
+                <th>Stock</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.ViewModel.Product.Variants.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input asp-for="ViewModel.Product.Variants[@i].VariantName" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="ViewModel.Product.Variants[@i].Sku" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="ViewModel.Product.Variants[@i].Stock" class="form-control" type="number" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-variant">X</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
+
+    <br />
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById("addVariant").addEventListener("click", function () {
+            var table = document.getElementById("variantsTable").getElementsByTagName('tbody')[0];
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            row.innerHTML = `
+                <td><input name="ViewModel.Product.Variants[${rowCount}].VariantName" class="form-control" /></td>
+                <td><input name="ViewModel.Product.Variants[${rowCount}].Sku" class="form-control" /></td>
+                <td><input name="ViewModel.Product.Variants[${rowCount}].Stock" type="number" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger remove-variant">X</button></td>
+            `;
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.classList.contains("remove-variant")) {
+                e.target.closest("tr").remove();
+            }
+        });
+    </script>
+}

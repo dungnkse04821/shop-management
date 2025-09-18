@@ -49,7 +49,11 @@ namespace ShopManagement.Entity
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
 
-        protected ProductVariant() { }
+        protected ProductVariant()
+        {
+            if (Id == Guid.Empty)
+                Id = Guid.NewGuid();
+        }
 
         public ProductVariant(string variantName, string sku, int stock, Guid productId)
         {
@@ -60,5 +64,4 @@ namespace ShopManagement.Entity
             ProductId = productId;
         }
     }
-
 }

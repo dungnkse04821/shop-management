@@ -1,0 +1,49 @@
+﻿@page "/products"
+@using Microsoft.AspNetCore.Components
+@using ShopManagement.IShopManagementService
+@using ShopManagement.Web.Pages.Products
+@inject IProductAppService ProductAppService
+@inject NavigationManager Navigation
+@model ShopManagement.Web.Pages.Products.ProductModel
+@{
+    ViewData["Title"] = "Products";
+}
+<h2>Products</h2>
+
+<a asp-page="Create" class="btn btn-primary mb-3">+ Add Product</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Sku</th>
+            <th>Name</th>
+            <th>Price Sell</th>
+            <th>Variants</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.Products)
+        {
+            <tr>
+                <td>@p.Sku</td>
+                <td>@p.Name</td>
+                <td>@p.PriceSell</td>
+                <td>
+                    <ul>
+                        @foreach (var v in p.Variants)
+                        {
+                            <li>@v.VariantName (@v.Stock)</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-info">Edit</a>
+                    <form asp-page-handler="Delete" method="post" asp-route-id="@p.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
