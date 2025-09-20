@@ -21,5 +21,8 @@ public class ShopManagementApplicationAutoMapperProfile : Profile
         .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants));
 
         CreateMap<CreateUpdateProductVariantDto, ProductVariant>();
+
+        CreateMap<Product, CreateUpdateProductDto>();
+        CreateMap<ProductVariant, CreateUpdateProductVariantDto>();
     }
 }

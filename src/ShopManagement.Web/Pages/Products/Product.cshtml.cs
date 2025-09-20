@@ -24,10 +24,11 @@ namespace ShopManagement.Web.Pages.Products
             Products = await _productAppService.GetListAsync();
         }
 
-        public async Task OnPostDeleteAsync(Guid id)
+        public async Task<IActionResult> OnPostDeleteAsync(Guid id)
         {
             await _productAppService.DeleteAsync(id);
             Products = await _productAppService.GetListAsync();
+            return RedirectToPage("./Product");
         }
     }
 }

@@ -29,7 +29,7 @@ namespace ShopManagement.Web.Pages.Products
                 return Page();
 
             await _productAppService.CreateAsync(Product);
-            return RedirectToPage("Index");
+            return RedirectToPage("./Product");
         }
     }
 }

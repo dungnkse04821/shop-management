@@ -34,40 +34,46 @@
         <input asp-for="ViewModel.Product.ImageUrl" class="form-control" />
     </div>
 
-    <h4>Variants</h4>
-    <table class="table" id="variantsTable">
-        <thead>
-            <tr>
-                <th>Variant Name</th>
-                <th>SKU</th>
-                <th>Stock</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.ViewModel.Product.Variants.Count; i++)
-            {
+    <div class="form-group">
+        <label>Variants</label>
+        <table class="table" id="variantsTable">
+            <thead>
                 <tr>
-                    <td>
-                        <input asp-for="ViewModel.Product.Variants[@i].VariantName" class="form-control" />
-                    </td>
-                    <td>
-                        <input asp-for="ViewModel.Product.Variants[@i].Sku" class="form-control" />
-                    </td>
-                    <td>
-                        <input asp-for="ViewModel.Product.Variants[@i].Stock" class="form-control" type="number" />
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger remove-variant">X</button>
-                    </td>
+                    <th>Variant Name</th>
+                    <th>SKU</th>
+                    <th>Stock</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-    <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
+            </thead>
+            <tbody>
+                @{
+                    var i = 0;
+                }
+                @foreach (var pro in Model.ViewModel.Product.Variants)
+                {
+                    <tr>
+                        <td>
+                            <input name="ViewModel.Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" />
+                        </td>
+                        <td>
+                            <input name="ViewModel.Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" />
+                        </td>
+                        <td>
+                            <input name="ViewModel.Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger remove-variant">X</button>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
+    </div>
 
-    <br />
     <button type="submit" class="btn btn-success">Save</button>
+    <a asp-page="Product" class="btn btn-secondary">Cancel</a>
 </form>
 
 @section Scripts {

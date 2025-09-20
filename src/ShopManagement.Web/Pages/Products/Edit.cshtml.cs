@@ -49,7 +49,7 @@ namespace ShopManagement.Web.Pages.Products
         public async Task<IActionResult> OnPostAsync()
         {
             await _productAppService.UpdateAsync(ViewModel.Id, ViewModel.Product);
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Product");
         }
     }
 }
