@@ -24,5 +24,11 @@ public class ShopManagementApplicationAutoMapperProfile : Profile
 
         CreateMap<Product, CreateUpdateProductDto>();
         CreateMap<ProductVariant, CreateUpdateProductVariantDto>();
+
+        CreateMap<Order, OrderDto>();
+        CreateMap<OrderItem, OrderItemDto>();
+
+        CreateMap<CreateOrderDto, Order>();
+        CreateMap<CreateOrderItemDto, OrderItem>();
     }
 }
