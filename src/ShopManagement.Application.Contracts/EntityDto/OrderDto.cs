@@ -36,4 +36,9 @@ namespace ShopManagement.EntityDto
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
     }
+
+    public class CreateOrderViewModel
+    {
+        public CreateOrderDto Order { get; set; } = new CreateOrderDto();
+    }
 }

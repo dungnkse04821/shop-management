@@ -1,0 +1,80 @@
+﻿@page
+@model ShopManagement.Web.Pages.Orders.CreateModel
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<h2>Create Order</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="ViewModel.Order.CustomerId"></label>
+        <input asp-for="ViewModel.Order.CustomerId" class="form-control" />
+    </div>
+
+    <h4>Order Items</h4>
+    <table class="table" id="orderItemsTable">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Variant</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.ViewModel.Order.Items.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input asp-for="ViewModel.Order.Items[@i].ProductId" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="ViewModel.Order.Items[@i].VariantId" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="ViewModel.Order.Items[@i].Quantity" class="form-control" type="number" />
+                    </td>
+                    <td>
+                        <input asp-for="ViewModel.Order.Items[@i].UnitPrice" class="form-control" type="number" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-item">X</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" id="addItem">+ Add Item</button>
+
+    <br /><br />
+    <button type="submit" class="btn btn-success">Save Order</button>
+</form>
+
+@section Scripts {
+    <script>
+        let itemIndex = @Model.ViewModel.Order.Items.Count;
+
+        document.getElementById("addItem").addEventListener("click", function () {
+            let table = document.getElementById("orderItemsTable").getElementsByTagName("tbody")[0];
+            let row = table.insertRow();
+
+            row.innerHTML = `
+                <td><input name="ViewModel.Order.Items[${itemIndex}].ProductId" class="form-control" /></td>
+                <td><input name="ViewModel.Order.Items[${itemIndex}].VariantId" class="form-control" /></td>
+                <td><input name="ViewModel.Order.Items[${itemIndex}].Quantity" type="number" class="form-control" /></td>
+                <td><input name="ViewModel.Order.Items[${itemIndex}].UnitPrice" type="number" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger remove-item">X</button></td>
+            `;
+
+            itemIndex++;
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("remove-item")) {
+                e.target.closest("tr").remove();
+            }
+        });
+    </script>
+}
