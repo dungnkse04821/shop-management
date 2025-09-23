@@ -26,6 +26,7 @@ namespace ShopManagement.EntityDto
         public DateTime UpdatedAt { get; set; }
 
         public List<ProductVariantDto> Variants { get; set; } = new();
+        public List<ProductImageDto> Images { get; set; } = new();
     }
 
     public class CreateUpdateProductVariantDto
@@ -45,6 +46,7 @@ namespace ShopManagement.EntityDto
         public string ImageUrl { get; set; }
 
         public List<CreateUpdateProductVariantDto> Variants { get; set; } = new();
+        public List<CreateUpdateProductImageDto> Images { get; set; } = new();
     }
 
     public class EditProductViewModel
@@ -52,4 +54,17 @@ namespace ShopManagement.EntityDto
         public Guid Id { get; set; }
         public CreateUpdateProductDto Product { get; set; } = new();
     }
+
+    public class ProductImageDto : EntityDto<Guid>
+    {
+        public string ImageUrl { get; set; }
+        public int SortOrder { get; set; }
+    }
+
+    public class CreateUpdateProductImageDto
+    {
+        public string ImageUrl { get; set; }
+        public int SortOrder { get; set; }
+    }
+
 }

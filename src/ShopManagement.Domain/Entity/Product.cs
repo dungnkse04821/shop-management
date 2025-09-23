@@ -21,8 +21,9 @@ namespace ShopManagement.Entity
 
         // Relationships
         public List<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+        public List<ProductImage> Images { get; set; } = new(); // thêm dòng này
 
-        protected Product() { } // EF Core cần constructor này
+        protected Product() { }
 
         public Product(string sku, string name, string description,
                        decimal priceBuy, decimal priceSell, string imageUrl)
@@ -33,13 +34,32 @@ namespace ShopManagement.Entity
             Description = description;
             PriceBuy = priceBuy;
             PriceSell = priceSell;
-            ImageUrl = imageUrl;
+            ImageUrl = imageUrl; // có thể giữ làm ảnh đại diện
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
             Variants = new List<ProductVariant>();
+            Images = new List<ProductImage>();
         }
     }
 
+    public class ProductImage : Entity<Guid>
+    {
+        public Guid ProductId { get; set; }
+        public Product Product { get; set; } = null!;
+
+        public string ImageUrl { get; set; } = null!;
+        public int SortOrder { get; set; } // để sắp xếp ảnh (ảnh chính, ảnh phụ)
+
+        protected ProductImage() { }
+
+        public ProductImage(string imageUrl, Guid productId, int sortOrder = 0)
+        {
+            Id = Guid.NewGuid();
+            ImageUrl = imageUrl;
+            ProductId = productId;
+            SortOrder = sortOrder;
+        }
+    }
     public class ProductVariant : Entity<Guid>
     {
         public string VariantName { get; set; } // ví dụ: Size M, Màu đỏ

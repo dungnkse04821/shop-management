@@ -72,6 +72,38 @@
         <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
     </div>
 
+    <h4>Product Images</h4>
+    <table class="table" id="imagesTable">
+        <thead>
+            <tr>
+                <th>Image URL</th>
+                <th>Sort Order</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var idx = 0;
+            }
+            @foreach (var pro in Model.ViewModel.Product.Images)
+            {
+                <tr>
+                    <td>
+                        <input name="ViewModel.Product.Images[@idx].ImageUrl" value="@pro.ImageUrl" class="form-control" />
+                    </td>
+                    <td>
+                        <input name="ViewModel.Product.Images[@idx].SortOrder" value="@pro.SortOrder" type="number" class="form-control" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-image">X</button>
+                    </td>
+                </tr>
+                idx++;
+            }
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" id="addImage">+ Add Image</button>
+
     <button type="submit" class="btn btn-success">Save</button>
     <a asp-page="Product" class="btn btn-secondary">Cancel</a>
 </form>
@@ -93,6 +125,24 @@
 
         document.addEventListener("click", function (e) {
             if (e.target && e.target.classList.contains("remove-variant")) {
+                e.target.closest("tr").remove();
+            }
+        });
+
+        document.getElementById("addImage").addEventListener("click", function () {
+            var table = document.getElementById("imagesTable").getElementsByTagName('tbody')[0];
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            row.innerHTML = `
+                <td><input name="Product.Images[${rowCount}].ImageUrl" class="form-control" /></td>
+                <td><input name="Product.Images[${rowCount}].SortOrder" type="number" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger remove-variant">X</button></td>
+            `;
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.classList.contains("remove-image")) {
                 e.target.closest("tr").remove();
             }
         });

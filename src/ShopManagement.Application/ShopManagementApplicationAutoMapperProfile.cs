@@ -30,5 +30,8 @@ public class ShopManagementApplicationAutoMapperProfile : Profile
 
         CreateMap<CreateOrderDto, Order>();
         CreateMap<CreateOrderItemDto, OrderItem>();
+
+        CreateMap<ProductImage, ProductImageDto>();
+        CreateMap<CreateUpdateProductImageDto, ProductImage>();
     }
 }

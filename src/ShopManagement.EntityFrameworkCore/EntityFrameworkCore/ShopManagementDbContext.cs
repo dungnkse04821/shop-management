@@ -36,6 +36,7 @@ public class ShopManagementDbContext :
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Shipment> Shipments { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
 
 
     #region Entities from the modules
@@ -106,6 +107,10 @@ public class ShopManagementDbContext :
              .WithOne(v => v.Product)
              .HasForeignKey(v => v.ProductId)
              .OnDelete(DeleteBehavior.Cascade);
+
+            b.HasMany(p => p.Images)
+             .WithOne(pi => pi.Product)
+             .HasForeignKey(pi => pi.ProductId);
         });
 
         modelBuilder.Entity<ProductVariant>(b =>
@@ -257,6 +262,13 @@ public class ShopManagementDbContext :
                   .WithOne(o => o.Shipment)
                   .HasForeignKey<Shipment>(s => s.OrderId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProductImage>(b =>
+        {
+            b.ToTable("ProductImages");
+            b.HasKey(x => x.Id);
+            b.Property(x => x.ImageUrl).IsRequired().HasMaxLength(500);
         });
     }
 }
