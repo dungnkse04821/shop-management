@@ -1,0 +1,27 @@
+﻿@page "/products/index"
+@model ShopManagement.Web.Pages.Products.IndexModel
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/Index.cshtml.css" />
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    @foreach (var product in Model.Products)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height:250px; object-fit:cover;" />
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@product.Name</h5>
+                    <p class="card-text text-muted">@product.Description</p>
+                    <p class="fw-bold text-danger">@product.PriceSell.ToString("N0") ₫</p>
+                    <a asp-page="./Detail" asp-route-id="@product.Id" class="btn btn-primary mt-auto">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

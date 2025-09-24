@@ -1,0 +1,22 @@
+﻿.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+    .card:hover {
+        transform: scale(1.03);
+    }
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    min-height: 40px;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
