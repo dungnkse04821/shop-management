@@ -1,49 +1,68 @@
 ﻿@page "/products"
-@using Microsoft.AspNetCore.Components
-@using ShopManagement.IShopManagementService
-@using ShopManagement.Web.Pages.Products
-@inject IProductAppService ProductAppService
-@inject NavigationManager Navigation
 @model ShopManagement.Web.Pages.Products.ProductModel
 @{
-    ViewData["Title"] = "Products";
+    ViewData["Title"] = "Danh sách sản phẩm";
 }
-<h2>Products</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/Pages/Css/Product.css" />
+}
 
-<a asp-page="Create" class="btn btn-primary mb-3">+ Add Product</a>
+<h2>@ViewData["Title"]</h2>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Sku</th>
-            <th>Name</th>
-            <th>Price Sell</th>
-            <th>Variants</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var p in Model.Products)
-        {
-            <tr>
-                <td>@p.Sku</td>
-                <td>@p.Name</td>
-                <td>@p.PriceSell</td>
-                <td>
-                    <ul>
-                        @foreach (var v in p.Variants)
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="get">
+            <div class="input-group">
+                <input type="text" name="SearchTerm" value="@Model.SearchTerm"
+                       class="form-control" placeholder="Tìm kiếm sản phẩm..." />
+                <button type="submit" class="btn btn-primary">Tìm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var product in Model.Products)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height:250px; object-fit:cover;" />
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@product.Name</h5>
+                    <p class="card-text text-muted">@product.Description</p>
+
+                    <!-- Giá chung (nếu có) -->
+                    <p class="fw-bold text-danger">@product.PriceSell.ToString("N0") ₫</p>
+
+                    <!-- Thông tin variants -->
+                    @if (@product.Variants != null && product.Variants.Any())
+                    {
+                        <ul class="list-unstyled small text-muted">
+                            @foreach (var variant in product.Variants)
+                            {
+                                <li>
+                                    <span class="fw-semibold">@variant.VariantName</span>
+                                    @* - Giá: @variant.Price.ToString("N0") ₫ *@
+                                    - SL: @variant.Stock
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    <div class="mt-auto d-flex justify-content-between">
+                        <a asp-page="./Detail" asp-route-id="@product.Id"
+                           class="btn btn-primary flex-fill me-2">Xem chi tiết</a>
+
+                        @if (Model.CanEdit)
                         {
-                            <li>@v.VariantName (@v.Stock)</li>
+                            <a asp-page="./Edit" asp-route-id="@product.Id"
+                               class="btn btn-warning flex-fill">Edit</a>
                         }
-                    </ul>
-                </td>
-                <td>
-                    <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-info">Edit</a>
-                    <form asp-page-handler="Delete" method="post" asp-route-id="@p.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
