@@ -6,7 +6,31 @@
 
 <h2>Edit Product</h2>
 
-<form method="post">
+<h4>Current Images</h4>
+<div class="mb-3 d-flex flex-wrap">
+    @if (Model.ViewModel.Product.Images != null && Model.ViewModel.Product.Images.Any())
+    {
+        foreach (var img in Model.ViewModel.Product.Images)
+        {
+            <div class="m-2 text-center border p-2">
+                <img src="@img.ImageUrl" alt="Product Image"
+                     style="width:120px; height:120px; object-fit:cover; border:1px solid #ccc;" />
+                <p class="small text-muted">Sort: @img.SortOrder</p>
+
+                <form method="post" asp-page-handler="DeleteImage" asp-route-imageId="@img.ImageUrl"
+                      onsubmit="return confirm('Bạn có chắc muốn xoá ảnh này?');">
+                    <button type="submit" class="btn btn-sm btn-danger mt-2">Xoá</button>
+                </form>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">No images uploaded yet.</p>
+    }
+</div>
+
+<form method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="ViewModel.Id" />
 
     <div class="form-group">
@@ -72,11 +96,11 @@
         <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
     </div>
 
-    <h4>Product Images</h4>
+    <h4>Upload New Images</h4>
     <table class="table" id="imagesTable">
         <thead>
             <tr>
-                <th>Image URL</th>
+                <th>Upload File</th>
                 <th>Sort Order</th>
                 <th></th>
             </tr>
@@ -89,7 +113,8 @@
             {
                 <tr>
                     <td>
-                        <input name="ViewModel.Product.Images[@idx].ImageUrl" value="@pro.ImageUrl" class="form-control" />
+                        <input type="file" name="ImageFiles[@idx]" accept="image/*" class="form-control image-input" />
+                        <input type="hidden" name="ViewModel.Product.Images[@idx].ImageUrl" value="@pro.ImageUrl" />
                     </td>
                     <td>
                         <input name="ViewModel.Product.Images[@idx].SortOrder" value="@pro.SortOrder" type="number" class="form-control" />
@@ -144,6 +169,24 @@
         document.addEventListener("click", function (e) {
             if (e.target && e.target.classList.contains("remove-image")) {
                 e.target.closest("tr").remove();
+            }
+        });
+
+                 document.addEventListener("change", function (e) {
+            if (e.target && e.target.classList.contains("image-input")) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        const preview = document.createElement("div");
+                        preview.classList.add("m-2", "text-center");
+                        preview.innerHTML = `
+                            <img src="${ev.target.result}" style="width:120px; height:120px; object-fit:cover; border:1px solid #ccc;" />
+                        `;
+                        document.getElementById("previewContainer").appendChild(preview);
+                    }
+                    reader.readAsDataURL(file);
+                }
             }
         });
     </script>
