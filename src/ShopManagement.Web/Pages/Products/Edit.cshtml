@@ -106,25 +106,17 @@
             </tr>
         </thead>
         <tbody>
-            @{
-                var idx = 0;
-            }
-            @foreach (var pro in Model.ViewModel.Product.Images)
-            {
-                <tr>
-                    <td>
-                        <input type="file" name="ImageFiles[@idx]" accept="image/*" class="form-control image-input" />
-                        <input type="hidden" name="ViewModel.Product.Images[@idx].ImageUrl" value="@pro.ImageUrl" />
-                    </td>
-                    <td>
-                        <input name="ViewModel.Product.Images[@idx].SortOrder" value="@pro.SortOrder" type="number" class="form-control" />
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger remove-image">X</button>
-                    </td>
-                </tr>
-                idx++;
-            }
+            <tr>
+                <td>
+                    <input type="file" name="ImageFiles" accept="image/*" class="form-control image-input" />
+                </td>
+                @* <td>
+                    <input name="ViewModel.Product.Images[0].SortOrder" value="0" type="number" class="form-control" />
+                </td> *@
+                <td>
+                    <button type="button" class="btn btn-danger remove-image">X</button>
+                </td>
+            </tr>
         </tbody>
     </table>
     <button type="button" class="btn btn-primary" id="addImage">+ Add Image</button>
@@ -160,9 +152,9 @@
             var row = table.insertRow(rowCount);
 
             row.innerHTML = `
-                <td><input name="Product.Images[${rowCount}].ImageUrl" class="form-control" /></td>
-                <td><input name="Product.Images[${rowCount}].SortOrder" type="number" class="form-control" /></td>
-                <td><button type="button" class="btn btn-danger remove-variant">X</button></td>
+                <td><input type="file" name="ImageFiles" accept="image/*" class="form-control image-input" /></td>
+                // <td><input name="ViewModel.Product.Images[0].SortOrder" value="0" type="number" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger remove-image">X</button></td>
             `;
         });
 

@@ -16,13 +16,16 @@ namespace ShopManagement.ShopManagementService
     {
         private readonly IRepository<Product, Guid> _productRepository;
         private readonly IRepository<ProductVariant, Guid> _variantRepository;
+        private readonly IRepository<ProductImage, Guid> _imageRepository;
 
         public ProductAppService(
             IRepository<Product, Guid> productRepository,
-            IRepository<ProductVariant, Guid> variantRepository)
+            IRepository<ProductVariant, Guid> variantRepository,
+            IRepository<ProductImage, Guid> imageRepository)
         {
             _productRepository = productRepository;
             _variantRepository = variantRepository;
+            _imageRepository = imageRepository;
         }
 
         public async Task<ProductDto> GetAsync(Guid id)
@@ -65,6 +68,15 @@ namespace ShopManagement.ShopManagementService
             {
                 await _variantRepository.DeleteAsync(ev);
             }
+
+            // Cập nhật variants: xóa cũ -> thêm mới (simple strategy)
+            var existingImages = await _imageRepository.GetListAsync(x => x.ProductId == product.Id);
+            foreach (var ei in existingImages)
+            {
+                await _imageRepository.DeleteAsync(ei);
+            }
+
+            await _imageRepository.InsertManyAsync(ObjectMapper.Map<List<ProductImageDto>, List<ProductImage>>(input.Images));
 
             foreach (var variant in input.Variants)
             {
