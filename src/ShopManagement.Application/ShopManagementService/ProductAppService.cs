@@ -1,11 +1,11 @@
-﻿using AutoMapper.Internal.Mappers;
+﻿using Microsoft.Extensions.Logging;
 using ShopManagement.Entity;
 using ShopManagement.EntityDto;
 using ShopManagement.IShopManagementService;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
@@ -30,14 +30,14 @@ namespace ShopManagement.ShopManagementService
 
         public async Task<ProductDto> GetAsync(Guid id)
         {
-            var product = await _productRepository.WithDetailsAsync(p => p.Variants);
+            var product = await _productRepository.WithDetailsAsync(p => p.Variants, p => p.Images);
             var entity = product.FirstOrDefault(p => p.Id == id);
             return ObjectMapper.Map<Product, ProductDto>(entity);
         }
 
         public async Task<List<ProductDto>> GetListAsync()
         {
-            var products = await _productRepository.WithDetailsAsync(p => p.Variants);
+            var products = await _productRepository.WithDetailsAsync(p => p.Variants, p => p.Images);
             return ObjectMapper.Map<List<Product>, List<ProductDto>>(products.ToList());
         }
 
@@ -54,42 +54,83 @@ namespace ShopManagement.ShopManagementService
         public async Task<ProductDto> UpdateAsync(Guid id, CreateUpdateProductDto input)
         {
             var product = await _productRepository.GetAsync(id);
+            if (product == null)
+            {
+                throw new Exception($"Product {id} not found");
+            }
 
+            // 1️⃣ Cập nhật thông tin cơ bản
             product.Name = input.Name;
             product.Description = input.Description;
             product.PriceBuy = input.PriceBuy;
             product.PriceSell = input.PriceSell;
-            product.ImageUrl = input.ImageUrl;
             product.UpdatedAt = DateTime.Now;
 
-            // Cập nhật variants: xóa cũ -> thêm mới (simple strategy)
-            var existingVariants = await _variantRepository.GetListAsync(x => x.ProductId == product.Id);
+            // 2️⃣ Xử lý ảnh — xóa cũ, thêm mới
+            await UpdateProductImagesAsync(product.Id, input.Images);
+
+            // 3️⃣ Xử lý variants
+            await UpdateProductVariantsAsync(product.Id, input.Variants);
+
+            await _productRepository.UpdateAsync(product, autoSave: true);
+            return ObjectMapper.Map<Product, ProductDto>(product);
+        }
+
+        private async Task UpdateProductImagesAsync(Guid productId, List<CreateUpdateProductImageDto> newImages)
+        {
+            var existingImages = await _imageRepository.GetListAsync(x => x.ProductId == productId);
+
+            // Xóa ảnh cũ cả trong DB và file vật lý
+            foreach (var ei in existingImages)
+            {
+                try
+                {
+                    var relativePath = ei.ImageUrl?.TrimStart('/');
+                    var fullPath = Path.Combine(AppContext.BaseDirectory, relativePath);
+                    if (File.Exists(fullPath))
+                    {
+                        File.Delete(fullPath);
+                    }
+
+                    await _imageRepository.DeleteAsync(ei);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"Không thể xóa file ảnh {ei.ImageUrl}: {ex.Message}");
+                }
+            }
+
+            // Thêm ảnh mới
+            foreach (var img in newImages.Where(i => !string.IsNullOrWhiteSpace(i.ImageUrl)))
+            {
+                await _imageRepository.InsertAsync(new ProductImage(
+                    img.ImageUrl,
+                    productId,
+                    img.SortOrder
+                ));
+            }
+        }
+
+        private async Task UpdateProductVariantsAsync(Guid productId, List<CreateUpdateProductVariantDto> newVariants)
+        {
+            var existingVariants = await _variantRepository.GetListAsync(x => x.ProductId == productId);
             foreach (var ev in existingVariants)
             {
                 await _variantRepository.DeleteAsync(ev);
             }
 
-            // Cập nhật variants: xóa cũ -> thêm mới (simple strategy)
-            var existingImages = await _imageRepository.GetListAsync(x => x.ProductId == product.Id);
-            foreach (var ei in existingImages)
+            foreach (var variant in newVariants)
             {
-                await _imageRepository.DeleteAsync(ei);
+                if (!string.IsNullOrWhiteSpace(variant.VariantName))
+                {
+                    await _variantRepository.InsertAsync(new ProductVariant(
+                        variant.VariantName,
+                        variant.Sku,
+                        variant.Stock,
+                        productId
+                    ));
+                }
             }
-
-            await _imageRepository.InsertManyAsync(ObjectMapper.Map<List<ProductImageDto>, List<ProductImage>>(input.Images));
-
-            foreach (var variant in input.Variants)
-            {
-                await _variantRepository.InsertAsync(new ProductVariant(
-                    variant.VariantName,
-                    variant.Sku,
-                    variant.Stock,
-                    product.Id
-                ));
-            }
-
-            await _productRepository.UpdateAsync(product, autoSave: true);
-            return ObjectMapper.Map<Product, ProductDto>(product);
         }
 
         public async Task DeleteAsync(Guid id)

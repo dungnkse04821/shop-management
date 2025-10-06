@@ -97,7 +97,6 @@ public class ShopManagementDbContext :
             b.Property(p => p.Description).HasMaxLength(1000);
             b.Property(p => p.PriceBuy).HasColumnType("decimal(18,2)");
             b.Property(p => p.PriceSell).HasColumnType("decimal(18,2)");
-            b.Property(p => p.ImageUrl).HasMaxLength(500);
 
             b.Property(p => p.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
             b.Property(p => p.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");

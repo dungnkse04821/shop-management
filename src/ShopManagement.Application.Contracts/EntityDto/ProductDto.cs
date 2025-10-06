@@ -21,7 +21,7 @@ namespace ShopManagement.EntityDto
         public string Description { get; set; }
         public decimal PriceBuy { get; set; }
         public decimal PriceSell { get; set; }
-        public string ImageUrl { get; set; }
+        //public string ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -43,10 +43,10 @@ namespace ShopManagement.EntityDto
         public string Description { get; set; }
         public decimal PriceBuy { get; set; }
         public decimal PriceSell { get; set; }
-        public string ImageUrl { get; set; }
+        //public string ImageUrl { get; set; }
 
         public List<CreateUpdateProductVariantDto> Variants { get; set; } = new();
-        public List<ProductImageDto> Images { get; set; } = new();
+        public List<CreateUpdateProductImageDto> Images { get; set; } = new();
     }
 
     public class EditProductViewModel
@@ -57,15 +57,14 @@ namespace ShopManagement.EntityDto
 
     public class ProductImageDto : EntityDto<Guid>
     {
-        public Guid ProductId { get; set; }
         public string ImageUrl { get; set; }
         public int SortOrder { get; set; }
     }
 
-    //public class CreateUpdateProductImageDto
-    //{
-    //    public string ImageUrl { get; set; }
-    //    public int SortOrder { get; set; }
-    //}
+    public class CreateUpdateProductImageDto
+    {
+        public string ImageUrl { get; set; }
+        public int SortOrder { get; set; }
+    }
 
 }

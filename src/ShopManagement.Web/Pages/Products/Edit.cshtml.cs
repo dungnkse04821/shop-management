@@ -40,8 +40,12 @@ namespace ShopManagement.Web.Pages.Products
                     Description = productDto.Description,
                     PriceBuy = productDto.PriceBuy,
                     PriceSell = productDto.PriceSell,
-                    ImageUrl = productDto.ImageUrl,
-                    Images = productDto.Images,
+                    //ImageUrl = productDto.ImageUrl,
+                    Images = productDto.Images.Select(v => new CreateUpdateProductImageDto
+                    {
+                        SortOrder = v.SortOrder,
+                        ImageUrl = v.ImageUrl
+                    }).ToList(),
                     Variants = productDto.Variants
                         .Select(v => new CreateUpdateProductVariantDto
                         {
@@ -50,7 +54,7 @@ namespace ShopManagement.Web.Pages.Products
                             Stock = v.Stock
                         }).ToList()
                 }
-            };            
+            };
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -70,15 +74,20 @@ namespace ShopManagement.Web.Pages.Products
                         }
 
                         // Lưu URL vào DB
-                        ViewModel.Product.Images.Add(new ProductImageDto
+                        ViewModel.Product.Images.Add(new CreateUpdateProductImageDto
                         {
-                            ProductId = ViewModel.Id,
                             ImageUrl = $"/images/products/{fileName}",
                             SortOrder = 0 // có thể cho người dùng nhập
                         });
                     }
                 }
             }
+
+            // ✅ Bỏ các ảnh trống (do model binding sinh ra)
+            ViewModel.Product.Images = ViewModel.Product.Images
+                .Where(x => !string.IsNullOrWhiteSpace(x.ImageUrl))
+                .ToList();
+
             await _productAppService.UpdateAsync(ViewModel.Id, ViewModel.Product);
             return RedirectToPage("./Product");
         }
