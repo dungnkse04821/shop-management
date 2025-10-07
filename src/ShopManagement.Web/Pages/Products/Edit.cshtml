@@ -53,10 +53,6 @@
         <label asp-for="ViewModel.Product.PriceSell"></label>
         <input asp-for="ViewModel.Product.PriceSell" class="form-control" type="number" />
     </div>
-  @*   <div class="form-group">
-        <label asp-for="ViewModel.Product.ImageUrl"></label>
-        <input asp-for="ViewModel.Product.ImageUrl" class="form-control" />
-    </div> *@
 
     <div class="form-group">
         <label>Variants</label>
@@ -111,7 +107,7 @@
                     <input type="file" name="ImageFiles" accept="image/*" class="form-control image-input" />
                 </td>
                 <td>
-                    <input name="ViewModel.Product.Images[0].SortOrder" value="0" type="number" class="form-control" />
+                    <input name="ViewModel.Product.Images[0].SortOrder" value="1" min="1" type="number" class="form-control" />
                 </td>
                 <td>
                     <button type="button" class="btn btn-danger remove-image">X</button>
@@ -153,7 +149,7 @@
 
             row.innerHTML = `
                 <td><input type="file" name="ImageFiles" accept="image/*" class="form-control image-input" /></td>
-                <td><input name="ViewModel.Product.Images[0].SortOrder" value="0" type="number" class="form-control" /></td>
+                <td><input name="ViewModel.Product.Images[0].SortOrder" value="1" min="1" type="number" class="form-control" /></td>
                 <td><button type="button" class="btn btn-danger remove-image">X</button></td>
             `;
         });

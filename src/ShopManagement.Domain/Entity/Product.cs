@@ -14,7 +14,6 @@ namespace ShopManagement.Entity
         public string Description { get; set; }
         public decimal PriceBuy { get; set; } // giá nhập
         public decimal PriceSell { get; set; } // giá bán mặc định
-        //public string ImageUrl { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
@@ -34,7 +33,6 @@ namespace ShopManagement.Entity
             Description = description;
             PriceBuy = priceBuy;
             PriceSell = priceSell;
-            //ImageUrl = imageUrl; // có thể giữ làm ảnh đại diện
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
             Variants = new List<ProductVariant>();

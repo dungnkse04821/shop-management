@@ -40,7 +40,6 @@ namespace ShopManagement.Web.Pages.Products
                     Description = productDto.Description,
                     PriceBuy = productDto.PriceBuy,
                     PriceSell = productDto.PriceSell,
-                    //ImageUrl = productDto.ImageUrl,
                     Images = productDto.Images.Select(v => new CreateUpdateProductImageDto
                     {
                         SortOrder = v.SortOrder,
