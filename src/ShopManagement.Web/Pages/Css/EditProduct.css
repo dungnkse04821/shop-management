@@ -1,0 +1,49 @@
+﻿/* Hiệu ứng hover cho ảnh chính */
+.carousel-item img {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.carousel-item img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+
+.main-image {
+    width: auto;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.main-image:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-gallery {
+    margin-top: 10px;
+}
+
+.thumbnail-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.15); /* làm border mờ nhẹ */
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.85;
+}
+
+.thumbnail-img:hover {
+    transform: scale(1.05);
+    border-color: rgba(0, 0, 0, 0.4);
+    opacity: 1;
+}
+
+.thumbnail-img.active {
+    border: 2px solid #007bff;
+    opacity: 1;
+}

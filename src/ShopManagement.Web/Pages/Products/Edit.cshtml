@@ -3,32 +3,53 @@
 @{
     ViewData["Title"] = "Edit Product";
 }
-
+@section Styles {
+    <link rel="stylesheet" href="~/Pages/Css/EditProduct.css" />
+}
 <h2>Edit Product</h2>
 
 <h4>Current Images</h4>
-<div class="mb-3 d-flex flex-wrap">
-    @if (Model.ViewModel.Product.Images != null && Model.ViewModel.Product.Images.Any())
-    {
-        foreach (var img in Model.ViewModel.Product.Images)
-        {
-            <div class="m-2 text-center border p-2">
-                <img src="@img.ImageUrl" alt="Product Image"
-                     style="width:120px; height:120px; object-fit:cover; border:1px solid #ccc;" />
-                <p class="small text-muted">Sort: @img.SortOrder</p>
 
-                <form method="post" asp-page-handler="DeleteImage" asp-route-imageId="@img.ImageUrl"
-                      onsubmit="return confirm('Bạn có chắc muốn xoá ảnh này?');">
-                    <button type="submit" class="btn btn-sm btn-danger mt-2">Xoá</button>
-                </form>
+@if (Model.ViewModel.Product.Images != null && Model.ViewModel.Product.Images.Any())
+{
+    <div class="text-center">
+        <!-- Carousel ảnh chính -->
+        <div id="productImageCarousel" class="carousel slide carousel-fade mb-3" data-bs-ride="carousel" data-bs-interval="3000">
+            <div class="carousel-inner">
+                @for (int i = 0; i < Model.ViewModel.Product.Images.Count; i++)
+                {
+                    var img = Model.ViewModel.Product.Images[i];
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <img src="@img.ImageUrl" class="d-block mx-auto main-image" alt="Product Image">
+                    </div>
+                }
             </div>
-        }
-    }
-    else
-    {
-        <p class="text-muted">No images uploaded yet.</p>
-    }
-</div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+
+        <!-- Thumbnails nhỏ bên dưới -->
+        <div class="thumbnail-gallery d-flex justify-content-center flex-wrap gap-2">
+            @for (int i = 0; i < Model.ViewModel.Product.Images.Count; i++)
+            {
+                var img = Model.ViewModel.Product.Images[i];
+                <img src="@img.ImageUrl"
+                     class="thumbnail-img"
+                     data-bs-target="#productImageCarousel"
+                     data-bs-slide-to="@i"
+                     alt="Thumbnail @(i + 1)">
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-muted">No images uploaded yet.</p>
+}
 
 <form method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="ViewModel.Id" />
@@ -175,6 +196,44 @@
                     }
                     reader.readAsDataURL(file);
                 }
+            }
+        });
+
+            //         document.addEventListener("DOMContentLoaded", function () {
+            //     const thumbs = document.querySelectorAll(".thumb-image");
+            //     const carousel = document.getElementById("productImageCarousel");
+
+            //     // Cập nhật trạng thái active khi chuyển slide
+            //     carousel.addEventListener("slide.bs.carousel", function (event) {
+            //         thumbs.forEach(t => t.classList.remove("active"));
+            //         thumbs[event.to].classList.add("active");
+            //     });
+
+            //     // Đánh dấu ảnh đầu tiên
+            //     if (thumbs.length > 0) thumbs[0].classList.add("active");
+            // });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const thumbnails = document.querySelectorAll(".thumbnail-img");
+            const carousel = document.querySelector("#productImageCarousel");
+
+            // Đồng bộ thumbnail khi click
+            thumbnails.forEach(tn => {
+                tn.addEventListener("click", function () {
+                    thumbnails.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                });
+            });
+
+            // Khi carousel thay đổi slide, đổi thumbnail active
+            carousel.addEventListener('slide.bs.carousel', function (e) {
+                thumbnails.forEach(t => t.classList.remove("active"));
+                thumbnails[e.to].classList.add("active");
+            });
+
+            // Đặt ảnh đầu tiên là active
+            if (thumbnails.length > 0) {
+                thumbnails[0].classList.add("active");
             }
         });
     </script>
