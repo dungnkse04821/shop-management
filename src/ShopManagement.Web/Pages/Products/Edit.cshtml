@@ -6,235 +6,128 @@
 @section Styles {
     <link rel="stylesheet" href="~/Pages/Css/EditProduct.css" />
 }
-<h2>Edit Product</h2>
-
-<h4>Current Images</h4>
-
-@if (Model.ViewModel.Product.Images != null && Model.ViewModel.Product.Images.Any())
-{
-    <div class="text-center">
-        <!-- Carousel ảnh chính -->
-        <div id="productImageCarousel" class="carousel slide carousel-fade mb-3" data-bs-ride="carousel" data-bs-interval="3000">
-            <div class="carousel-inner">
-                @for (int i = 0; i < Model.ViewModel.Product.Images.Count; i++)
-                {
-                    var img = Model.ViewModel.Product.Images[i];
-                    <div class="carousel-item @(i == 0 ? "active" : "")">
-                        <img src="@img.ImageUrl" class="d-block mx-auto main-image" alt="Product Image">
-                    </div>
-                }
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button>
-        </div>
-
-        <!-- Thumbnails nhỏ bên dưới -->
-        <div class="thumbnail-gallery d-flex justify-content-center flex-wrap gap-2">
-            @for (int i = 0; i < Model.ViewModel.Product.Images.Count; i++)
-            {
-                var img = Model.ViewModel.Product.Images[i];
-                <img src="@img.ImageUrl"
-                     class="thumbnail-img"
-                     data-bs-target="#productImageCarousel"
-                     data-bs-slide-to="@i"
-                     alt="Thumbnail @(i + 1)">
-            }
-        </div>
-    </div>
-}
-else
-{
-    <p class="text-muted">No images uploaded yet.</p>
-}
-
-<form method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="ViewModel.Id" />
-
-    <div class="form-group">
-        <label asp-for="ViewModel.Product.Sku"></label>
-        <input asp-for="ViewModel.Product.Sku" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="ViewModel.Product.Name"></label>
-        <input asp-for="ViewModel.Product.Name" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="ViewModel.Product.Description"></label>
-        <textarea asp-for="ViewModel.Product.Description" class="form-control"></textarea>
-    </div>
-    <div class="form-group">
-        <label asp-for="ViewModel.Product.PriceBuy"></label>
-        <input asp-for="ViewModel.Product.PriceBuy" class="form-control" type="number" />
-    </div>
-    <div class="form-group">
-        <label asp-for="ViewModel.Product.PriceSell"></label>
-        <input asp-for="ViewModel.Product.PriceSell" class="form-control" type="number" />
-    </div>
-
-    <div class="form-group">
-        <label>Variants</label>
-        <table class="table" id="variantsTable">
-            <thead>
-                <tr>
-                    <th>Variant Name</th>
-                    <th>SKU</th>
-                    <th>Stock</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    var i = 0;
-                }
-                @foreach (var pro in Model.ViewModel.Product.Variants)
-                {
-                    <tr>
-                        <td>
-                            <input name="ViewModel.Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" />
-                        </td>
-                        <td>
-                            <input name="ViewModel.Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" />
-                        </td>
-                        <td>
-                            <input name="ViewModel.Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" />
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger remove-variant">X</button>
-                        </td>
-                    </tr>
-                    i++;
-                }
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
-    </div>
-
-    <h4>Upload New Images</h4>
-    <table class="table" id="imagesTable">
-        <thead>
-            <tr>
-                <th>Upload File</th>
-                <th>Sort Order</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <input type="file" name="ImageFiles" accept="image/*" class="form-control image-input" />
-                </td>
-                <td>
-                    <input name="ViewModel.Product.Images[0].SortOrder" value="1" min="1" type="number" class="form-control" />
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger remove-image">X</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <button type="button" class="btn btn-primary" id="addImage">+ Add Image</button>
-
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-page="Product" class="btn btn-secondary">Cancel</a>
-</form>
 
 @section Scripts {
-    <script>
-        document.getElementById("addVariant").addEventListener("click", function () {
-            var table = document.getElementById("variantsTable").getElementsByTagName('tbody')[0];
-            var rowCount = table.rows.length;
-            var row = table.insertRow(rowCount);
-
-            row.innerHTML = `
-                <td><input name="ViewModel.Product.Variants[${rowCount}].VariantName" class="form-control" /></td>
-                <td><input name="ViewModel.Product.Variants[${rowCount}].Sku" class="form-control" /></td>
-                <td><input name="ViewModel.Product.Variants[${rowCount}].Stock" type="number" class="form-control" /></td>
-                <td><button type="button" class="btn btn-danger remove-variant">X</button></td>
-            `;
-        });
-
-        document.addEventListener("click", function (e) {
-            if (e.target && e.target.classList.contains("remove-variant")) {
-                e.target.closest("tr").remove();
-            }
-        });
-
-        document.getElementById("addImage").addEventListener("click", function () {
-            var table = document.getElementById("imagesTable").getElementsByTagName('tbody')[0];
-            var rowCount = table.rows.length;
-            var row = table.insertRow(rowCount);
-
-            row.innerHTML = `
-                <td><input type="file" name="ImageFiles" accept="image/*" class="form-control image-input" /></td>
-                <td><input name="ViewModel.Product.Images[0].SortOrder" value="1" min="1" type="number" class="form-control" /></td>
-                <td><button type="button" class="btn btn-danger remove-image">X</button></td>
-            `;
-        });
-
-        document.addEventListener("click", function (e) {
-            if (e.target && e.target.classList.contains("remove-image")) {
-                e.target.closest("tr").remove();
-            }
-        });
-
-                 document.addEventListener("change", function (e) {
-            if (e.target && e.target.classList.contains("image-input")) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (ev) {
-                        const preview = document.createElement("div");
-                        preview.classList.add("m-2", "text-center");
-                        preview.innerHTML = `
-                            <img src="${ev.target.result}" style="width:120px; height:120px; object-fit:cover; border:1px solid #ccc;" />
-                        `;
-                        document.getElementById("previewContainer").appendChild(preview);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
-        });
-
-            //         document.addEventListener("DOMContentLoaded", function () {
-            //     const thumbs = document.querySelectorAll(".thumb-image");
-            //     const carousel = document.getElementById("productImageCarousel");
-
-            //     // Cập nhật trạng thái active khi chuyển slide
-            //     carousel.addEventListener("slide.bs.carousel", function (event) {
-            //         thumbs.forEach(t => t.classList.remove("active"));
-            //         thumbs[event.to].classList.add("active");
-            //     });
-
-            //     // Đánh dấu ảnh đầu tiên
-            //     if (thumbs.length > 0) thumbs[0].classList.add("active");
-            // });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const thumbnails = document.querySelectorAll(".thumbnail-img");
-            const carousel = document.querySelector("#productImageCarousel");
-
-            // Đồng bộ thumbnail khi click
-            thumbnails.forEach(tn => {
-                tn.addEventListener("click", function () {
-                    thumbnails.forEach(t => t.classList.remove("active"));
-                    this.classList.add("active");
-                });
-            });
-
-            // Khi carousel thay đổi slide, đổi thumbnail active
-            carousel.addEventListener('slide.bs.carousel', function (e) {
-                thumbnails.forEach(t => t.classList.remove("active"));
-                thumbnails[e.to].classList.add("active");
-            });
-
-            // Đặt ảnh đầu tiên là active
-            if (thumbnails.length > 0) {
-                thumbnails[0].classList.add("active");
-            }
-        });
-    </script>
+    <script src="~/Pages/Js/EditProduct.js"></script>
 }
+<h2>Edit Product</h2>
+<div class="container mt-4">
+    <div class="row align-items-start">
+        <!-- Vùng hiển thị ảnh -->
+        <div class="col-md-6 text-center mb-4 mb-md-0">
+            @if (Model.ViewModel.Product.Images != null && Model.ViewModel.Product.Images.Any())
+            {
+                <!-- Carousel ảnh chính -->
+                <div id="productImageCarousel" class="carousel slide carousel-fade mb-3" data-bs-ride="carousel" data-bs-interval="3000">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.ViewModel.Product.Images.Count; i++)
+                        {
+                            var img = Model.ViewModel.Product.Images[i];
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@img.ImageUrl" class="d-block mx-auto main-image img-fluid rounded shadow" alt="Product Image">
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+
+                <!-- Thumbnails nhỏ bên dưới -->
+                <div class="thumbnail-gallery d-flex justify-content-center flex-wrap gap-2">
+                    @for (int i = 0; i < Model.ViewModel.Product.Images.Count; i++)
+                    {
+                        var img = Model.ViewModel.Product.Images[i];
+                        <img src="@img.ImageUrl"
+                             class="thumbnail-img rounded"
+                             data-bs-target="#productImageCarousel"
+                             data-bs-slide-to="@i"
+                             alt="Thumbnail @(i + 1)">
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No images uploaded yet.</p>
+            }
+        </div>
+
+        <!-- Form chỉnh sửa nằm bên phải -->
+        <div class="col-md-6">
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="ViewModel.Id" />
+
+                <div class="form-group">
+                    <label asp-for="ViewModel.Product.Sku"></label>
+                    <input asp-for="ViewModel.Product.Sku" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ViewModel.Product.Name"></label>
+                    <input asp-for="ViewModel.Product.Name" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ViewModel.Product.Description"></label>
+                    <textarea asp-for="ViewModel.Product.Description" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ViewModel.Product.PriceBuy"></label>
+                    <input asp-for="ViewModel.Product.PriceBuy" class="form-control" type="number" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ViewModel.Product.PriceSell"></label>
+                    <input asp-for="ViewModel.Product.PriceSell" class="form-control" type="number" />
+                </div>
+
+                <div class="form-group">
+                    <table class="table" id="variantsTable">
+                        <thead>
+                            <tr>
+                                <th>Variant Name</th>
+                                <th>SKU</th>
+                                <th>Stock</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var i = 0;
+                            }
+                            @foreach (var pro in Model.ViewModel.Product.Variants)
+                            {
+                                <tr>
+                                    <td>
+                                        <input name="ViewModel.Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input name="ViewModel.Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input name="ViewModel.Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-variant">X</button>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary" id="addVariant">+ Add Variant</button>
+                </div>
+                <br/>
+                <div class="mb-3">
+                    <label for="imageInput" class="form-label fw-bold">Thêm ảnh sản phẩm</label>
+                    <input type="file" id="imageInput" name="ImageFiles" accept="image/*" multiple class="form-control" />
+                </div>
+
+                <div id="previewContainer" class="d-flex flex-wrap mt-3"></div>
+
+                <button type="submit" class="btn btn-success">Save</button>
+                <a asp-page="Product" class="btn btn-secondary ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ShopManagement.Entity;
 using ShopManagement.EntityDto;
 using ShopManagement.IShopManagementService;
 using System;
@@ -19,7 +20,10 @@ namespace ShopManagement.Web.Pages.Products
         public EditProductViewModel ViewModel { get; set; } = new();
 
         [BindProperty]
-        public List<IFormFile> ImageFiles { get; set; } = new();
+        public List<IFormFile> ImageFiles { get; set; }
+
+        [BindProperty]
+        public Product Product { get; set; }
 
         public EditModel(IProductAppService productAppService)
         {
