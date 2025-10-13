@@ -27,6 +27,7 @@ document.addEventListener("click", function (e) {
 document.addEventListener("DOMContentLoaded", () => {
     const imageInput = document.getElementById("imageInput");
     const previewContainer = document.getElementById("previewContainer");
+    const form = document.querySelector("form");
     let imagesData = [];
 
     if (!imageInput || !previewContainer) return;
@@ -35,151 +36,78 @@ document.addEventListener("DOMContentLoaded", () => {
     imageInput.addEventListener("change", () => {
         const files = Array.from(imageInput.files);
 
-        files.forEach((file) => {
+        // Giữ lại ảnh cũ, chỉ thêm mới vào
+        files.forEach(file => {
             if (!file.type.startsWith("image/")) return;
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                imagesData.push({
-                    name: file.name,
-                    url: e.target.result,
-                    file: file
-                });
-                renderPreview();
+                // Không thêm trùng
+                if (!imagesData.some(x => x.url === e.target.result)) {
+                    imagesData.push({
+                        name: file.name,
+                        url: e.target.result,
+                        file: file
+                    });
+                    renderPreview();
+                }
             };
             reader.readAsDataURL(file);
         });
 
-        //imageInput.value = "";
+        // reset input để chọn lại cùng ảnh nếu cần
+        imageInput.value = "";
     });
 
-    // ====== Hàm render preview ======
+    // ====== Render preview ======
     function renderPreview() {
         previewContainer.innerHTML = "";
 
         imagesData.forEach((img, index) => {
             const wrapper = document.createElement("div");
-            wrapper.classList.add("m-2", "text-center", "position-relative", "draggable-item");
+            wrapper.classList.add("position-relative", "m-2");
             wrapper.style.width = "120px";
-            wrapper.setAttribute("draggable", "true");
-            wrapper.setAttribute("data-index", index);
 
             wrapper.innerHTML = `
-                <img src="${img.url}"
-                     alt="preview"
-                     class="preview-img-thumbnail shadow-sm"
-                     style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px;" />
+                <img src="${img.url}" alt="${img.name}"
+                    class="img-thumbnail shadow-sm"
+                    style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px;" />
 
                 <button type="button"
                         class="btn btn-sm btn-danger position-absolute top-0 end-0 translate-middle"
-                        style="border-radius: 50%; width: 25px; height: 25px; line-height: 1;"
+                        style="border-radius: 50%; width: 25px; height: 25px;"
                         data-index="${index}">
                     ×
                 </button>
-
-                <div class="small text-muted mt-1">#${index + 1}</div>
-
-                <input type="hidden" name="Product.Images[${index}].SortOrder" value="${index + 1}" />
-                <input type="hidden" name="Product.Images[${index}].FileName" value="${img.name}" />
+                <div class="small text-muted mt-1 text-center">#${index + 1}</div>
             `;
 
             previewContainer.appendChild(wrapper);
         });
 
-        addDeleteEvents();
-        addDragDropEvents();
+        bindDeleteEvents();
     }
 
     // ====== Xử lý xóa ảnh ======
-    function addDeleteEvents() {
+    function bindDeleteEvents() {
         previewContainer.querySelectorAll(".btn-danger").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                const index = parseInt(e.currentTarget.getAttribute("data-index"));
-                imagesData.splice(index, 1);
+            btn.addEventListener("click", e => {
+                const idx = parseInt(e.currentTarget.getAttribute("data-index"));
+                imagesData.splice(idx, 1);
                 renderPreview();
             });
         });
     }
 
-    // ====== Xử lý Drag & Drop ======
-    function addDragDropEvents() {
-        const draggables = previewContainer.querySelectorAll(".draggable-item");
-
-        draggables.forEach((item) => {
-            item.addEventListener("dragstart", handleDragStart);
-            item.addEventListener("dragover", handleDragOver);
-            item.addEventListener("drop", handleDrop);
-            item.addEventListener("dragend", handleDragEnd);
-        });
-    }
-
-    let draggedItem = null;
-
-    function handleDragStart(e) {
-        draggedItem = this;
-        this.classList.add("dragging");
-        e.dataTransfer.effectAllowed = "move";
-    }
-
-    function handleDragOver(e) {
-        e.preventDefault();
-        const draggingOverItem = this;
-
-        if (draggingOverItem === draggedItem) return;
-
-        const allItems = Array.from(previewContainer.children);
-        const draggingIndex = allItems.indexOf(draggedItem);
-        const overIndex = allItems.indexOf(draggingOverItem);
-
-        if (draggingIndex < overIndex) {
-            previewContainer.insertBefore(draggedItem, draggingOverItem.nextSibling);
-        } else {
-            previewContainer.insertBefore(draggedItem, draggingOverItem);
-        }
-    }
-
-    function handleDrop(e) {
-        e.stopPropagation();
-        updateImagesOrder();
-    }
-
-    function handleDragEnd(e) {
-        this.classList.remove("dragging");
-        updateImagesOrder();
-    }
-
-    // ====== Cập nhật lại thứ tự ảnh (SortOrder) sau khi kéo thả ======
-    function updateImagesOrder() {
-        const newOrder = Array.from(previewContainer.children).map(div => {
-            const imgTag = div.querySelector("img");
-            const fileName = imgTag?.getAttribute("alt") || "";
-            const found = imagesData.find(i => i.name === fileName);
-            return found || null;
-        }).filter(Boolean);
-
-        // Nếu không tìm thấy theo alt, fallback theo url
-        if (newOrder.length !== imagesData.length) {
-            const urls = Array.from(previewContainer.querySelectorAll("img")).map(img => img.src);
-            imagesData.sort((a, b) => urls.indexOf(a.url) - urls.indexOf(b.url));
-        } else {
-            imagesData = newOrder;
-        }
-
-        renderPreview();
-    }
-
-    // ====== 🔥 Gắn file thực vào form khi submit ======
-    const form = document.querySelector("form");
+    // ====== Khi submit form ======
     if (form) {
-        form.addEventListener("submit", (e) => {
-            // Xóa các input ẩn cũ (nếu có)
+        form.addEventListener("submit", e => {
+            // Xóa input ẩn cũ
             form.querySelectorAll(".hidden-upload").forEach(x => x.remove());
 
-            // Tạo đối tượng DataTransfer để gom file
             const dt = new DataTransfer();
             imagesData.forEach(img => dt.items.add(img.file));
 
-            // Tạo input file ẩn mang toàn bộ file user đã chọn
             const hiddenFileInput = document.createElement("input");
             hiddenFileInput.type = "file";
             hiddenFileInput.name = "ImageFiles";
@@ -187,11 +115,11 @@ document.addEventListener("DOMContentLoaded", () => {
             hiddenFileInput.files = dt.files;
             hiddenFileInput.classList.add("hidden-upload");
 
-            // Thêm vào form
             form.appendChild(hiddenFileInput);
         });
     }
 });
+
 
 
 
