@@ -17,13 +17,13 @@ namespace ShopManagement.Web.Pages.Products
         private readonly IProductAppService _productAppService;
 
         [BindProperty]
-        public EditProductViewModel ViewModel { get; set; } = new();
+        public EditProductViewModel ViewModel { get; set; } = new EditProductViewModel();
 
-        [BindProperty]
-        public List<IFormFile> ImageFiles { get; set; }
+        [BindProperty(SupportsGet = false)]
+        public List<IFormFile> ImageFiles { get; set; } = new();
 
-        [BindProperty]
-        public Product Product { get; set; }
+        //[BindProperty]
+        //public Product Product { get; set; }
 
         public EditModel(IProductAppService productAppService)
         {

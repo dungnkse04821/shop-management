@@ -98,14 +98,27 @@
     opacity: 1;
 }
 
+.draggable-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    border: 2px dashed #999;
+}
+
+#previewContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 #previewContainer img {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #previewContainer img:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
 
 #previewContainer .btn-danger {
     opacity: 0.85;

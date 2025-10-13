@@ -121,6 +121,13 @@
                 <div class="mb-3">
                     <label for="imageInput" class="form-label fw-bold">Thêm ảnh sản phẩm</label>
                     <input type="file" id="imageInput" name="ImageFiles" accept="image/*" multiple class="form-control" />
+                @*     @if (Model.ViewModel.Product.Images != null)
+                    {
+                        @foreach (var img in Model.ViewModel.Product.Images)
+                        {
+                            <input type="hidden" name="ExistingImages" value="@img.ImageUrl" />
+                        }
+                    } *@
                 </div>
 
                 <div id="previewContainer" class="d-flex flex-wrap mt-3"></div>
