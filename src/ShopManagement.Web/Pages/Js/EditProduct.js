@@ -28,23 +28,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const imageInput = document.getElementById("imageInput");
     const previewContainer = document.getElementById("previewContainer");
     const form = document.querySelector("form");
-    let imagesData = [];
 
-    if (!imageInput || !previewContainer) return;
+    // Mảng lưu ảnh cũ và mới
+    let existingImages = [];
+    let newImages = [];
 
-    // ====== Khi chọn ảnh ======
+    // ====== 1️⃣ Load ảnh cũ từ Razor (nếu có) ======
+    document.querySelectorAll('input[name="ExistingImages"]').forEach(input => {
+        existingImages.push({
+            url: input.value,
+            isDeleted: false
+        });
+    });
+
+    renderPreview();
+
+    // ====== 2️⃣ Khi chọn ảnh mới ======
     imageInput.addEventListener("change", () => {
         const files = Array.from(imageInput.files);
 
-        // Giữ lại ảnh cũ, chỉ thêm mới vào
         files.forEach(file => {
             if (!file.type.startsWith("image/")) return;
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 // Không thêm trùng
-                if (!imagesData.some(x => x.url === e.target.result)) {
-                    imagesData.push({
+                if (!newImages.some(x => x.url === e.target.result)) {
+                    newImages.push({
                         name: file.name,
                         url: e.target.result,
                         file: file
@@ -55,31 +65,54 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.readAsDataURL(file);
         });
 
-        // reset input để chọn lại cùng ảnh nếu cần
         imageInput.value = "";
     });
 
-    // ====== Render preview ======
+    // ====== 3️⃣ Render preview ảnh cũ + ảnh mới ======
     function renderPreview() {
         previewContainer.innerHTML = "";
 
-        imagesData.forEach((img, index) => {
+        // --- Ảnh cũ ---
+        existingImages.forEach((img, index) => {
+            if (img.isDeleted) return; // không render ảnh bị xóa
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("position-relative", "m-2");
+            wrapper.style.width = "120px";
+
+            wrapper.innerHTML = `
+                <img src="${img.url}" alt="old_${index}"
+                     class="img-thumbnail shadow-sm"
+                     style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px;" />
+                <button type="button"
+                        class="btn btn-sm btn-danger position-absolute top-0 end-0 translate-middle"
+                        style="border-radius: 50%; width: 25px; height: 25px;"
+                        data-type="old" data-index="${index}">
+                    ×
+                </button>
+                <div class="small text-muted mt-1 text-center">Ảnh cũ #${index + 1}</div>
+            `;
+
+            previewContainer.appendChild(wrapper);
+        });
+
+        // --- Ảnh mới ---
+        newImages.forEach((img, index) => {
             const wrapper = document.createElement("div");
             wrapper.classList.add("position-relative", "m-2");
             wrapper.style.width = "120px";
 
             wrapper.innerHTML = `
                 <img src="${img.url}" alt="${img.name}"
-                    class="img-thumbnail shadow-sm"
-                    style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px;" />
-
+                     class="img-thumbnail shadow-sm"
+                     style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px;" />
                 <button type="button"
                         class="btn btn-sm btn-danger position-absolute top-0 end-0 translate-middle"
                         style="border-radius: 50%; width: 25px; height: 25px;"
-                        data-index="${index}">
+                        data-type="new" data-index="${index}">
                     ×
                 </button>
-                <div class="small text-muted mt-1 text-center">#${index + 1}</div>
+                <div class="small text-muted mt-1 text-center">Ảnh mới #${index + 1}</div>
             `;
 
             previewContainer.appendChild(wrapper);
@@ -88,25 +121,33 @@ document.addEventListener("DOMContentLoaded", () => {
         bindDeleteEvents();
     }
 
-    // ====== Xử lý xóa ảnh ======
+    // ====== 4️⃣ Xử lý xóa ảnh ======
     function bindDeleteEvents() {
         previewContainer.querySelectorAll(".btn-danger").forEach(btn => {
             btn.addEventListener("click", e => {
-                const idx = parseInt(e.currentTarget.getAttribute("data-index"));
-                imagesData.splice(idx, 1);
+                const type = e.currentTarget.getAttribute("data-type");
+                const index = parseInt(e.currentTarget.getAttribute("data-index"));
+
+                if (type === "old") {
+                    existingImages[index].isDeleted = true; // đánh dấu xóa ảnh cũ
+                } else if (type === "new") {
+                    newImages.splice(index, 1); // xóa ảnh mới
+                }
+
                 renderPreview();
             });
         });
     }
 
-    // ====== Khi submit form ======
+    // ====== 5️⃣ Trước khi submit ======
     if (form) {
         form.addEventListener("submit", e => {
             // Xóa input ẩn cũ
             form.querySelectorAll(".hidden-upload").forEach(x => x.remove());
 
+            // --- Gắn file mới ---
             const dt = new DataTransfer();
-            imagesData.forEach(img => dt.items.add(img.file));
+            newImages.forEach(img => dt.items.add(img.file));
 
             const hiddenFileInput = document.createElement("input");
             hiddenFileInput.type = "file";
@@ -114,11 +155,23 @@ document.addEventListener("DOMContentLoaded", () => {
             hiddenFileInput.multiple = true;
             hiddenFileInput.files = dt.files;
             hiddenFileInput.classList.add("hidden-upload");
-
             form.appendChild(hiddenFileInput);
+
+            // --- Gắn danh sách ảnh cũ còn giữ ---
+            existingImages
+                .filter(img => !img.isDeleted)
+                .forEach(img => {
+                    const hiddenInput = document.createElement("input");
+                    hiddenInput.type = "hidden";
+                    hiddenInput.name = "ExistingImages";
+                    hiddenInput.value = img.url;
+                    hiddenInput.classList.add("hidden-upload");
+                    form.appendChild(hiddenInput);
+                });
         });
     }
 });
+
 
 
 

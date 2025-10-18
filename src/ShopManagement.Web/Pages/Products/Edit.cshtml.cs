@@ -22,6 +22,8 @@ namespace ShopManagement.Web.Pages.Products
         [BindProperty(SupportsGet = false)]
         public List<IFormFile> ImageFiles { get; set; } = new();
 
+        [BindProperty]
+        public List<string> ExistingImages { get; set; }
         //[BindProperty]
         //public Product Product { get; set; }
 
@@ -62,6 +64,57 @@ namespace ShopManagement.Web.Pages.Products
 
         public async Task<IActionResult> OnPostAsync()
         {
+            //if (!ModelState.IsValid)
+            //    return Page();
+
+            //// Lấy thông tin sản phẩm gốc
+            //var product = await _productAppService.GetAsync(ViewModel.Id);
+            //if (product == null)
+            //    return NotFound();
+
+            //// 1️⃣ Cập nhật thông tin cơ bản
+            //product.Sku = ViewModel.Product.Sku;
+            //product.Name = ViewModel.Product.Name;
+            //product.Description = ViewModel.Product.Description;
+            //product.PriceBuy = ViewModel.Product.PriceBuy;
+            //product.PriceSell = ViewModel.Product.PriceSell;
+
+            //// 2️⃣ Cập nhật variants
+            //product.Variants = ViewModel.Product.Variants;
+
+            //// 3️⃣ Giữ lại ảnh cũ (chỉ những ảnh còn tồn tại sau khi xóa)
+            //var existingImages = Request.Form["ExistingImages"].ToList();
+            //product.Images = product.Images
+            //    .Where(i => existingImages.Contains(i.ImageUrl))
+            //    .ToList();
+
+            //// 4️⃣ Thêm ảnh mới nếu có
+            //var files = Request.Form.Files;
+            //foreach (var file in files)
+            //{
+            //    if (file.Length > 0)
+            //    {
+            //        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            //        var filePath = Path.Combine("wwwroot/uploads", fileName);
+
+            //        using (var stream = new FileStream(filePath, FileMode.Create))
+            //        {
+            //            await file.CopyToAsync(stream);
+            //        }
+
+            //        product.Images.Add(new ProductImageDto
+            //        {
+            //            ImageUrl = "/uploads/" + fileName
+            //        });
+            //    }
+            //}
+
+            //// 5️⃣ Cập nhật lại vào DB qua service
+            //await _productAppService.UpdateAsync(product);
+
+            //return RedirectToPage("Product");
+
+
             if (ImageFiles != null && ImageFiles.Count > 0)
             {
                 foreach (var file in ImageFiles)
