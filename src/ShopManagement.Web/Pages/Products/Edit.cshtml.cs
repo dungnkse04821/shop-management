@@ -64,57 +64,29 @@ namespace ShopManagement.Web.Pages.Products
 
         public async Task<IActionResult> OnPostAsync()
         {
-            //if (!ModelState.IsValid)
-            //    return Page();
+            // đảm bảo list tồn tại
+            if (ViewModel.Product.Images == null)
+                ViewModel.Product.Images = new List<CreateUpdateProductImageDto>();
 
-            //// Lấy thông tin sản phẩm gốc
-            //var product = await _productAppService.GetAsync(ViewModel.Id);
-            //if (product == null)
-            //    return NotFound();
+            // 1. Lấy danh sách ảnh cũ gửi từ form (ExistingImages)
+            var finalImages = new List<CreateUpdateProductImageDto>();
 
-            //// 1️⃣ Cập nhật thông tin cơ bản
-            //product.Sku = ViewModel.Product.Sku;
-            //product.Name = ViewModel.Product.Name;
-            //product.Description = ViewModel.Product.Description;
-            //product.PriceBuy = ViewModel.Product.PriceBuy;
-            //product.PriceSell = ViewModel.Product.PriceSell;
+            if (ExistingImages != null && ExistingImages.Count > 0)
+            {
+                foreach (var url in ExistingImages)
+                {
+                    if (!string.IsNullOrWhiteSpace(url))
+                    {
+                        finalImages.Add(new CreateUpdateProductImageDto
+                        {
+                            ImageUrl = url,
+                            SortOrder = 0
+                        });
+                    }
+                }
+            }
 
-            //// 2️⃣ Cập nhật variants
-            //product.Variants = ViewModel.Product.Variants;
-
-            //// 3️⃣ Giữ lại ảnh cũ (chỉ những ảnh còn tồn tại sau khi xóa)
-            //var existingImages = Request.Form["ExistingImages"].ToList();
-            //product.Images = product.Images
-            //    .Where(i => existingImages.Contains(i.ImageUrl))
-            //    .ToList();
-
-            //// 4️⃣ Thêm ảnh mới nếu có
-            //var files = Request.Form.Files;
-            //foreach (var file in files)
-            //{
-            //    if (file.Length > 0)
-            //    {
-            //        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-            //        var filePath = Path.Combine("wwwroot/uploads", fileName);
-
-            //        using (var stream = new FileStream(filePath, FileMode.Create))
-            //        {
-            //            await file.CopyToAsync(stream);
-            //        }
-
-            //        product.Images.Add(new ProductImageDto
-            //        {
-            //            ImageUrl = "/uploads/" + fileName
-            //        });
-            //    }
-            //}
-
-            //// 5️⃣ Cập nhật lại vào DB qua service
-            //await _productAppService.UpdateAsync(product);
-
-            //return RedirectToPage("Product");
-
-
+            // 2. Lưu ảnh mới lên disk và thêm vào finalImages
             if (ImageFiles != null && ImageFiles.Count > 0)
             {
                 foreach (var file in ImageFiles)
@@ -122,31 +94,39 @@ namespace ShopManagement.Web.Pages.Products
                     if (file.Length > 0)
                     {
                         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                        var filePath = Path.Combine("wwwroot/images/products", fileName);
+                        var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+                        Directory.CreateDirectory(dir);
+                        var filePath = Path.Combine(dir, fileName);
 
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await file.CopyToAsync(stream);
                         }
 
-                        // Lưu URL vào DB
-                        ViewModel.Product.Images.Add(new CreateUpdateProductImageDto
+                        finalImages.Add(new CreateUpdateProductImageDto
                         {
                             ImageUrl = $"/images/products/{fileName}",
-                            SortOrder = 0 // có thể cho người dùng nhập
+                            SortOrder = 0
                         });
                     }
                 }
             }
 
-            // ✅ Bỏ các ảnh trống (do model binding sinh ra)
-            ViewModel.Product.Images = ViewModel.Product.Images
-                .Where(x => !string.IsNullOrWhiteSpace(x.ImageUrl))
+            // 3. Loại bỏ trùng lặp (theo ImageUrl) — giữ thứ tự (ảnh cũ trước, ảnh mới sau)
+            finalImages = finalImages
+                .GroupBy(x => x.ImageUrl, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
                 .ToList();
 
+            // 4. Gán lại vào ViewModel.Product.Images (chỉ danh sách hợp lệ)
+            ViewModel.Product.Images = finalImages;
+
+            // 5. Gọi service update
             await _productAppService.UpdateAsync(ViewModel.Id, ViewModel.Product);
+
             return RedirectToPage("./Product");
         }
+
 
         //public async Task<IActionResult> OnPostDeleteImageAsync(Guid imageId)
         //{

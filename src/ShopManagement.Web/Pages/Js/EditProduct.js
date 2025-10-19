@@ -25,24 +25,16 @@ document.addEventListener("click", function (e) {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const imageInput = document.getElementById("imageInput");
     const previewContainer = document.getElementById("previewContainer");
+    const imageInput = document.getElementById("imageInput");
     const form = document.querySelector("form");
 
-    // Mảng lưu ảnh cũ và mới
+    // đọc danh sách ảnh cũ từ data attribute (một nguồn duy nhất)
     let existingImages = [];
+    document.querySelectorAll('input[name="ExistingImages"]').forEach(input => { existingImages.push({ url: input.value, isDeleted: false }); });
+
     let newImages = [];
-
-    // ====== 1️⃣ Load ảnh cũ từ Razor (nếu có) ======
-    document.querySelectorAll('input[name="ExistingImages"]').forEach(input => {
-        existingImages.push({
-            url: input.value,
-            isDeleted: false
-        });
-    });
-
     renderPreview();
-
     // ====== 2️⃣ Khi chọn ảnh mới ======
     imageInput.addEventListener("change", () => {
         const files = Array.from(imageInput.files);
@@ -142,10 +134,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====== 5️⃣ Trước khi submit ======
     if (form) {
         form.addEventListener("submit", e => {
-            // Xóa input ẩn cũ
+            // Xóa tất cả input ExistingImages cũ (nếu có, phòng ngừa)
+            // đảm bảo xóa toàn bộ trước khi DataTransfer thêm vào
+            form.querySelectorAll('input[name="ExistingImages"]').forEach(x => x.remove());
+
+            // thêm đoạn log kiểm tra
+            console.log("Đã xóa input cũ, còn lại:", form.querySelectorAll('input[name="ExistingImages"]').length);
             form.querySelectorAll(".hidden-upload").forEach(x => x.remove());
 
-            // --- Gắn file mới ---
+            // Gắn file mới (DataTransfer)
             const dt = new DataTransfer();
             newImages.forEach(img => dt.items.add(img.file));
 
@@ -157,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
             hiddenFileInput.classList.add("hidden-upload");
             form.appendChild(hiddenFileInput);
 
-            // --- Gắn danh sách ảnh cũ còn giữ ---
+            // Gắn lại danh sách các ảnh cũ còn giữ
             existingImages
                 .filter(img => !img.isDeleted)
                 .forEach(img => {
@@ -170,6 +167,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
     }
+
+    renderPreview();
+
 });
 
 
