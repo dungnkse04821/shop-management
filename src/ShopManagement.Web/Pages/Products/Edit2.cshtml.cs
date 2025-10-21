@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ShopManagement.Entity;
 using ShopManagement.EntityDto;
 using ShopManagement.IShopManagementService;
 using System;
@@ -12,51 +11,44 @@ using System.Threading.Tasks;
 
 namespace ShopManagement.Web.Pages.Products
 {
-    public class EditModel : PageModel
+    public class EditModel2 : PageModel
     {
         private readonly IProductAppService _productAppService;
 
         [BindProperty]
-        public EditProductViewModel ViewModel { get; set; } = new EditProductViewModel();
-
-        [BindProperty(SupportsGet = false)]
-        public List<IFormFile> ImageFiles { get; set; } = new();
+        public ProductFormViewModel ViewModel { get; set; } = new() { SubmitLabel = "Update" };
 
         [BindProperty]
         public List<string> ExistingImages { get; set; }
 
-        public EditModel(IProductAppService productAppService)
+        public EditModel2(IProductAppService productAppService)
         {
             _productAppService = productAppService;
         }
 
         public async Task OnGetAsync(Guid id)
         {
-            var productDto = await _productAppService.GetAsync(id);
+            var dto = await _productAppService.GetAsync(id);
 
-            ViewModel = new EditProductViewModel
+            ViewModel.Id = dto.Id;
+            ViewModel.Product = new CreateUpdateProductDto
             {
-                Id = productDto.Id,
-                Product = new CreateUpdateProductDto
+                Sku = dto.Sku,
+                Name = dto.Name,
+                Description = dto.Description,
+                PriceBuy = dto.PriceBuy,
+                PriceSell = dto.PriceSell,
+                Variants = dto.Variants.Select(v => new CreateUpdateProductVariantDto
                 {
-                    Sku = productDto.Sku,
-                    Name = productDto.Name,
-                    Description = productDto.Description,
-                    PriceBuy = productDto.PriceBuy,
-                    PriceSell = productDto.PriceSell,
-                    Images = productDto.Images.Select(v => new CreateUpdateProductImageDto
-                    {
-                        SortOrder = v.SortOrder,
-                        ImageUrl = v.ImageUrl
-                    }).ToList(),
-                    Variants = productDto.Variants
-                        .Select(v => new CreateUpdateProductVariantDto
-                        {
-                            Sku = v.Sku,
-                            VariantName = v.VariantName,
-                            Stock = v.Stock
-                        }).ToList()
-                }
+                    Sku = v.Sku,
+                    VariantName = v.VariantName,
+                    Stock = v.Stock
+                }).ToList(),
+                Images = dto.Images.Select(i => new CreateUpdateProductImageDto
+                {
+                    ImageUrl = i.ImageUrl,
+                    SortOrder = i.SortOrder
+                }).ToList()
             };
         }
 
@@ -85,9 +77,9 @@ namespace ShopManagement.Web.Pages.Products
             }
 
             // 2. Lưu ảnh mới lên disk và thêm vào finalImages
-            if (ImageFiles != null && ImageFiles.Count > 0)
+            if (ViewModel.ImageFiles != null && ViewModel.ImageFiles.Count > 0)
             {
-                foreach (var file in ImageFiles)
+                foreach (var file in ViewModel.ImageFiles)
                 {
                     if (file.Length > 0)
                     {
