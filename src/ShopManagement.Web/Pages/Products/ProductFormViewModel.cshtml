@@ -50,24 +50,24 @@
                 <input type="hidden" asp-for="@Model.Id" />
 
                 <div class="form-group">
-                    <label asp-for="@Model.Product.Sku"></label>
-                    <input asp-for="@Model.Product.Sku" class="form-control" />
+                    <label asp-for="Product.Sku"></label>
+                    <input asp-for="Product.Sku" class="form-control" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="@Model.Product.Name"></label>
-                    <input asp-for="@Model.Product.Name" class="form-control" />
+                    <label asp-for="Product.Name"></label>
+                    <input asp-for="Product.Name" class="form-control" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="@Model.Product.Description"></label>
-                    <textarea asp-for="@Model.Product.Description" class="form-control"></textarea>
+                    <label asp-for="Product.Description"></label>
+                    <textarea asp-for="Product.Description" class="form-control"></textarea>
                 </div>
                 <div class="form-group">
-                    <label asp-for="@Model.Product.PriceBuy"></label>
-                    <input asp-for="@Model.Product.PriceBuy" class="form-control" type="number" />
+                    <label asp-for="Product.PriceBuy"></label>
+                    <input asp-for="Product.PriceBuy" class="form-control" type="number" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="@Model.Product.PriceSell"></label>
-                    <input asp-for="@Model.Product.PriceSell" class="form-control" type="number" />
+                    <label asp-for="Product.PriceSell"></label>
+                    <input asp-for="Product.PriceSell" class="form-control" type="number" />
                 </div>
 
                 <div class="form-group">
@@ -88,13 +88,13 @@
                             {
                                 <tr>
                                     <td>
-                                        <input name="Model.Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" />
+                                        <input name="@Model.Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" />
                                     </td>
                                     <td>
-                                        <input name="Model.Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" />
+                                        <input name="@Model.Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" />
                                     </td>
                                     <td>
-                                        <input name="Model.Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" />
+                                        <input name="@Model.Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" />
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger remove-variant">X</button>
