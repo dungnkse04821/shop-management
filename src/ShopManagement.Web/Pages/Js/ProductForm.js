@@ -4,9 +4,9 @@
     var row = table.insertRow(rowCount);
 
     row.innerHTML = `
-                <td><input name="ViewModel.Product.Variants[${rowCount}].VariantName" class="form-control" /></td>
-                <td><input name="ViewModel.Product.Variants[${rowCount}].Sku" class="form-control" /></td>
-                <td><input name="ViewModel.Product.Variants[${rowCount}].Stock" type="number" class="form-control" /></td>
+                <td><input name="Product.Variants[${rowCount}].VariantName" class="form-control" /></td>
+                <td><input name="Product.Variants[${rowCount}].Sku" class="form-control" /></td>
+                <td><input name="Product.Variants[${rowCount}].Stock" type="number" class="form-control" /></td>
                 <td><button type="button" class="btn btn-danger remove-variant">X</button></td>
             `;
 });

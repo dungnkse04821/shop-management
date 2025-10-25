@@ -16,7 +16,7 @@ namespace ShopManagement.Web.Pages.Products
         private readonly IProductAppService _productAppService;
 
         [BindProperty]
-        public ProductFormViewModel ViewModel { get; set; } = new() { SubmitLabel = "Update" };
+        public ProductFormViewModel ProductForm { get; set; } = new() { SubmitLabel = "Update" };
 
         [BindProperty]
         public List<string> ExistingImages { get; set; }
@@ -30,8 +30,8 @@ namespace ShopManagement.Web.Pages.Products
         {
             var dto = await _productAppService.GetAsync(id);
 
-            ViewModel.Id = dto.Id;
-            ViewModel.Product = new CreateUpdateProductDto
+            ProductForm.Id = dto.Id;
+            ProductForm.Product = new CreateUpdateProductDto
             {
                 Sku = dto.Sku,
                 Name = dto.Name,
@@ -55,8 +55,8 @@ namespace ShopManagement.Web.Pages.Products
         public async Task<IActionResult> OnPostAsync()
         {
             // đảm bảo list tồn tại
-            if (ViewModel.Product.Images == null)
-                ViewModel.Product.Images = new List<CreateUpdateProductImageDto>();
+            if (ProductForm.Product.Images == null)
+                ProductForm.Product.Images = new List<CreateUpdateProductImageDto>();
 
             // 1. Lấy danh sách ảnh cũ gửi từ form (ExistingImages)
             var finalImages = new List<CreateUpdateProductImageDto>();
@@ -77,9 +77,9 @@ namespace ShopManagement.Web.Pages.Products
             }
 
             // 2. Lưu ảnh mới lên disk và thêm vào finalImages
-            if (ViewModel.ImageFiles != null && ViewModel.ImageFiles.Count > 0)
+            if (ProductForm.ImageFiles != null && ProductForm.ImageFiles.Count > 0)
             {
-                foreach (var file in ViewModel.ImageFiles)
+                foreach (var file in ProductForm.ImageFiles)
                 {
                     if (file.Length > 0)
                     {
@@ -109,10 +109,10 @@ namespace ShopManagement.Web.Pages.Products
                 .ToList();
 
             // 4. Gán lại vào ViewModel.Product.Images (chỉ danh sách hợp lệ)
-            ViewModel.Product.Images = finalImages;
+            ProductForm.Product.Images = finalImages;
 
             // 5. Gọi service update
-            await _productAppService.UpdateAsync(ViewModel.Id, ViewModel.Product);
+            await _productAppService.UpdateAsync(ProductForm.Id, ProductForm.Product);
 
             return RedirectToPage("./Product");
         }

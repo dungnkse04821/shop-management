@@ -81,24 +81,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @{
-                                var i = 0;
-                            }
-                            @foreach (var pro in @Model.Product.Variants)
+                            @for (int i = 0; i < Model.Product.Variants.Count; i++)
                             {
+                                var pro = Model.Product.Variants[i];
                                 <tr>
-                                    <td>
-                                        <input name="@Model.Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" />
-                                    </td>
-                                    <td>
-                                        <input name="@Model.Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" />
-                                    </td>
-                                    <td>
-                                        <input name="@Model.Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" />
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger remove-variant">X</button>
-                                    </td>
+                                    <td><input name="Product.Variants[@i].VariantName" value="@pro.VariantName" class="form-control" /></td>
+                                    <td><input name="Product.Variants[@i].Sku" value="@pro.Sku" class="form-control" /></td>
+                                    <td><input name="Product.Variants[@i].Stock" value="@pro.Stock" type="number" class="form-control" /></td>
+                                    <td><button type="button" class="btn btn-danger remove-variant">X</button></td>
                                 </tr>
                                 i++;
                             }
