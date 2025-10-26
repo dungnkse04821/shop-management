@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ShopManagement.EntityDto;
 using ShopManagement.IShopManagementService;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShopManagement.Web.Pages.Products
@@ -16,33 +19,50 @@ namespace ShopManagement.Web.Pages.Products
         }
 
         [BindProperty]
-        public ProductFormViewModel ViewModel { get; set; } = new() { SubmitLabel = "Create" };
+        public ProductFormViewModel ProductForm { get; set; } = new() { SubmitLabel = "Create" };
 
         public void OnGet() { }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid) return Page();
+            // 1. Lấy danh sách ảnh cũ gửi từ form (ExistingImages)
+            var finalImages = new List<CreateUpdateProductImageDto>();
 
-            // Upload ảnh
-            if (ViewModel.ImageFiles?.Count > 0)
+            if (ProductForm.ImageFiles != null && ProductForm.ImageFiles.Count > 0)
             {
-                foreach (var file in ViewModel.ImageFiles)
+                foreach (var file in ProductForm.ImageFiles)
                 {
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                    var path = Path.Combine("wwwroot/images/products", fileName);
-                    using var stream = new FileStream(path, FileMode.Create);
-                    await file.CopyToAsync(stream);
-
-                    ViewModel.Product.Images.Add(new EntityDto.CreateUpdateProductImageDto
+                    if (file.Length > 0)
                     {
-                        ImageUrl = $"/images/products/{fileName}",
-                        SortOrder = ViewModel.Product.Images.Count + 1
-                    });
+                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                        var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+                        Directory.CreateDirectory(dir);
+                        var filePath = Path.Combine(dir, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        finalImages.Add(new CreateUpdateProductImageDto
+                        {
+                            ImageUrl = $"/images/products/{fileName}",
+                            SortOrder = 0
+                        });
+                    }
                 }
             }
 
-            await _productAppService.CreateAsync(ViewModel.Product);
+            // 3. Loại bỏ trùng lặp (theo ImageUrl) — giữ thứ tự (ảnh cũ trước, ảnh mới sau)
+            finalImages = finalImages
+                .GroupBy(x => x.ImageUrl, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .ToList();
+
+            // 4. Gán lại vào ViewModel.Product.Images (chỉ danh sách hợp lệ)
+            ProductForm.Product.Images = finalImages;
+
+            await _productAppService.CreateAsync(ProductForm.Product);
             return RedirectToPage("./Product");
         }
     }

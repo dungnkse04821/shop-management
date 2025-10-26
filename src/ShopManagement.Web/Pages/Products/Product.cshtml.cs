@@ -28,6 +28,7 @@ namespace ShopManagement.Web.Pages.Products
         }
 
         public bool CanEdit { get; set; }
+        public bool CanCreate { get; set; }
         public async Task OnGetAsync()
         {
             // Lấy danh sách sản phẩm từ service
@@ -46,6 +47,9 @@ namespace ShopManagement.Web.Pages.Products
             // Check quyền edit
             CanEdit = await _authorizationService
                 .IsGrantedAsync(ShopManagementPermissions.Products.Edit);
+            // Check quyền create
+            CanCreate = await _authorizationService
+                .IsGrantedAsync(ShopManagementPermissions.Products.Create);
         }
     }
 }

@@ -20,6 +20,13 @@
             </div>
         </form>
     </div>
+    @if (Model.CanCreate)
+    {
+        <div class="col-md-6">
+            <a asp-page="./Create" asp-route-id=""
+               class="btn btn-warning flex-fill">Create</a>
+        </div>
+    }
 </div>
 
 <div class="row">
@@ -58,7 +65,7 @@
 
                         @if (Model.CanEdit)
                         {
-                            <a asp-page="./Edit2" asp-route-id="@product.Id"
+                            <a asp-page="./Edit" asp-route-id="@product.Id"
                                class="btn btn-warning flex-fill">Edit</a>
                         }
                     </div>

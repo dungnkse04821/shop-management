@@ -11,8 +11,7 @@ public class ShopManagementPermissionDefinitionProvider : PermissionDefinitionPr
         var myGroup = context.AddGroup(ShopManagementPermissions.GroupName);
         var products = myGroup.AddPermission(ShopManagementPermissions.Products.Default, L("Permission:Products"));
         products.AddChild(ShopManagementPermissions.Products.Edit, L("Permission:Edit"));
-        //Define your own permissions here. Example:
-        //myGroup.AddPermission(ShopManagementPermissions.MyPermission1, L("Permission:MyPermission1"));
+        products.AddChild(ShopManagementPermissions.Products.Create, L("Permission:Create"));
     }
 
     private static LocalizableString L(string name)
