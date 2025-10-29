@@ -1,0 +1,32 @@
+﻿@page "/categories"
+@model ShopManagement.Web.Pages.Categories.CategoryModel
+@{
+    ViewData["Title"] = "Category List";
+}
+
+<h2>Categories</h2>
+<a asp-page="Create" class="btn btn-primary mb-3">+ Add Category</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th style="width:150px">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cat in Model.Categories)
+        {
+            <tr>
+                <td>@cat.Name</td>
+                <td>@cat.Description</td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@cat.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-page-handler="Delete" asp-route-id="@cat.Id" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this category?')">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

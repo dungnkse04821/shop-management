@@ -1,5 +1,4 @@
-﻿using AutoMapper.Internal.Mappers;
-using ShopManagement.Entity;
+﻿using ShopManagement.Entity;
 using ShopManagement.EntityDto;
 using ShopManagement.IShopManagementService;
 using System;

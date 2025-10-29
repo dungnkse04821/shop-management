@@ -33,7 +33,7 @@ public class ShopManagementApplicationAutoMapperProfile : Profile
         CreateMap<CreateUpdateProductImageDto,ProductImage>().ReverseMap();
 
         CreateMap<Category, CategoryDto>().ReverseMap();
-        CreateMap<CreateUpdateCategoryDto, Category>().ReverseMap();
+        CreateMap<CreateUpdateCategoryDto, Category>();
 
     }
 }
