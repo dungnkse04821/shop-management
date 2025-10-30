@@ -1,0 +1,13 @@
+﻿@page
+@model ShopManagement.Web.Pages.Categories.CreateModel
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<h2>Create Category</h2>
+
+<form method="post">
+    <partial name="CategoryForm" model="Model.Category" />
+    <button type="submit" class="btn btn-success">Create</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
