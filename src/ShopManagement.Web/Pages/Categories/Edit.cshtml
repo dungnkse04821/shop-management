@@ -1,0 +1,13 @@
+﻿@page "{id:guid}"
+@model ShopManagement.Web.Pages.Categories.EditModel
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<h2>Edit Category</h2>
+
+<form method="post">
+    <partial name="CategoryForm" model="Model.Category" />
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
