@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using Volo.Abp.Application.Dtos;
@@ -23,6 +24,9 @@ namespace ShopManagement.EntityDto
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
+        public Guid CategoryId { get; set; }
+        public string? CategoryName { get; set; }
+
         public List<ProductVariantDto> Variants { get; set; } = new();
         public List<ProductImageDto> Images { get; set; } = new();
     }
@@ -41,6 +45,9 @@ namespace ShopManagement.EntityDto
         public string Description { get; set; }
         public decimal PriceBuy { get; set; }
         public decimal PriceSell { get; set; }
+
+        [Required]
+        public Guid CategoryId { get; set; }
 
         public List<CreateUpdateProductVariantDto> Variants { get; set; } = new();
         public List<CreateUpdateProductImageDto> Images { get; set; } = new();

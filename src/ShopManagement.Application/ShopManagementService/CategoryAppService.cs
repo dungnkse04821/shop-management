@@ -11,7 +11,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace ShopManagement.ShopManagementService
 {
-    public class CategoryAppService : ApplicationService, ICategoryAppService
+    public class CategoryAppService : ShopManagementAppService, ICategoryAppService
     {
         private readonly IRepository<Category, Guid> _categoryRepository;
 

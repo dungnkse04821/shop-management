@@ -9,7 +9,8 @@ public class ShopManagementApplicationAutoMapperProfile : Profile
     public ShopManagementApplicationAutoMapperProfile()
     {
         CreateMap<Product, ProductDto>()
-            .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants));
+            .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants))
+            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name)); ;
 
         CreateMap<ProductVariant, ProductVariantDto>();
 

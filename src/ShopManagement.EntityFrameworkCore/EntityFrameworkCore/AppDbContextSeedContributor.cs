@@ -65,11 +65,11 @@ namespace ShopManagement.EntityFrameworkCore
             // ======================
             // 2. Seed Product + Variant
             // ======================
-            var product1 = new Product("P001", "Áo Thun Nam", "Áo thun cotton 100%", 100000, 150000, "/images/ao-thun.jpg");
+            var product1 = new Product("P001", "Áo Thun Nam", "Áo thun cotton 100%", 100000, 150000, Guid.NewGuid());
             var variant11 = new ProductVariant("Size M - Trắng", "P001-M-W", 50, product1.Id);
             var variant12 = new ProductVariant("Size L - Đen", "P001-L-B", 30, product1.Id);
 
-            var product2 = new Product("P002", "Giày Sneaker", "Giày sneaker thoáng khí", 500000, 750000, "/images/giay.jpg");
+            var product2 = new Product("P002", "Giày Sneaker", "Giày sneaker thoáng khí", 500000, 750000, Guid.NewGuid());
             var variant21 = new ProductVariant("Size 41 - Trắng", "P002-41-W", 20, product2.Id);
             var variant22 = new ProductVariant("Size 42 - Đen", "P002-42-B", 15, product2.Id);
 

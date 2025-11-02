@@ -43,6 +43,15 @@ public class ShopManagementMenuContributor : IMenuContributor
             )
         );
 
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                "Categories",
+                l["Categories"],
+                url: "/categories",
+                icon: "fa fa-box"
+            )
+        );
+
         if (MultiTenancyConsts.IsEnabled)
         {
             administration.SetSubItemOrder(TenantManagementMenuNames.GroupName, 1);

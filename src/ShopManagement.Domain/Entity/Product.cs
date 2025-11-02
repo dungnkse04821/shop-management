@@ -18,14 +18,17 @@ namespace ShopManagement.Entity
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        // Relationships
+
+        public Guid CategoryId { get; set; }
+        public Category Category { get; set; } = null!;
+
         public List<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
         public List<ProductImage> Images { get; set; } = new(); // thêm dòng này
 
         protected Product() { }
 
         public Product(string sku, string name, string description,
-                       decimal priceBuy, decimal priceSell, string imageUrl)
+                       decimal priceBuy, decimal priceSell, Guid categoryId)
         {
             Id = Guid.NewGuid();
             Sku = sku;
@@ -33,6 +36,7 @@ namespace ShopManagement.Entity
             Description = description;
             PriceBuy = priceBuy;
             PriceSell = priceSell;
+            CategoryId = categoryId;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
             Variants = new List<ProductVariant>();

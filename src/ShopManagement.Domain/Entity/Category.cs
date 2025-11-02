@@ -9,18 +9,20 @@ namespace ShopManagement.Entity
 {
     public class Category : Entity<Guid>
     {
-        public string Name { get; private set; } = null!;
-        public string? Description { get; private set; }
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
 
-        public virtual ICollection<Product> Products { get; private set; } = new List<Product>();
+        // Quan hệ 1-n: Category -> Products
+        public List<Product> Products { get; set; } = new();
 
-        protected Category() { } // EF Core cần constructor rỗng
+        protected Category() { }
 
-        public Category(Guid id, string name, string? description = null)
-            : base(id)
+        public Category(string name, string? description = null)
         {
+            Id = Guid.NewGuid();
             Name = name;
             Description = description;
+            Products = new List<Product>();
         }
 
         public void Update(string name, string? description = null)

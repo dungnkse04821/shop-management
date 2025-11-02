@@ -30,6 +30,7 @@ public class ShopManagementDbContext :
     public DbSet<User> ShopUsers { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Category> Categories { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -110,6 +111,30 @@ public class ShopManagementDbContext :
             b.HasMany(p => p.Images)
              .WithOne(pi => pi.Product)
              .HasForeignKey(pi => pi.ProductId);
+
+            b.HasOne(p => p.Category)
+             .WithMany(c => c.Products)
+             .HasForeignKey(p => p.CategoryId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Category>(b =>
+        {
+            b.ToTable("Categories");
+            b.HasKey(c => c.Id);
+
+            b.Property(c => c.Name)
+             .IsRequired()
+             .HasMaxLength(200);
+
+            b.Property(c => c.Description)
+             .HasMaxLength(500);
+
+            // 1-n: Category → Products
+            b.HasMany(c => c.Products)
+             .WithOne(p => p.Category)
+             .HasForeignKey(p => p.CategoryId)
+             .OnDelete(DeleteBehavior.Restrict); // tránh xoá category gây xoá hết sản phẩm
         });
 
         modelBuilder.Entity<ProductVariant>(b =>
