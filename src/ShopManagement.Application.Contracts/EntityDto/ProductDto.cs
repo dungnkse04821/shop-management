@@ -46,7 +46,6 @@ namespace ShopManagement.EntityDto
         public decimal PriceBuy { get; set; }
         public decimal PriceSell { get; set; }
 
-        [Required]
         public Guid CategoryId { get; set; }
 
         public List<CreateUpdateProductVariantDto> Variants { get; set; } = new();

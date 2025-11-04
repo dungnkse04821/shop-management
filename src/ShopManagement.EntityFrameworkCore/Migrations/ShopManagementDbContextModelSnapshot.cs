@@ -56,7 +56,7 @@ namespace ShopManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("ShopManagement.Entity.Invoice", b =>
@@ -372,7 +372,7 @@ namespace ShopManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShopUsers");
+                    b.ToTable("ShopUsers", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
