@@ -24,8 +24,8 @@ namespace ShopManagement.EntityDto
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public Guid CategoryId { get; set; }
-        public string? CategoryName { get; set; }
+        public List<Guid> CategoryIds { get; set; } = new();
+        public List<CategoryDto> Categories { get; set; } = new();
 
         public List<ProductVariantDto> Variants { get; set; } = new();
         public List<ProductImageDto> Images { get; set; } = new();
@@ -45,9 +45,7 @@ namespace ShopManagement.EntityDto
         public string Description { get; set; }
         public decimal PriceBuy { get; set; }
         public decimal PriceSell { get; set; }
-
-        public Guid CategoryId { get; set; }
-
+        public List<Guid> CategoryIds { get; set; } = new();
         public List<CreateUpdateProductVariantDto> Variants { get; set; } = new();
         public List<CreateUpdateProductImageDto> Images { get; set; } = new();
     }

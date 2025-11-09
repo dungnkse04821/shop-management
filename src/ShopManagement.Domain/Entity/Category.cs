@@ -11,24 +11,7 @@ namespace ShopManagement.Entity
     {
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
+        public List<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 
-        // Quan hệ 1-n: Category -> Products
-        public List<Product> Products { get; set; } = new();
-
-        protected Category() { }
-
-        public Category(string name, string? description = null)
-        {
-            Id = Guid.NewGuid();
-            Name = name;
-            Description = description;
-            Products = new List<Product>();
-        }
-
-        public void Update(string name, string? description = null)
-        {
-            Name = name;
-            Description = description;
-        }
     }
 }

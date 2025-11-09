@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ShopManagement.Entity;
 using ShopManagement.EntityDto;
+using System.Linq;
 
 namespace ShopManagement;
 
@@ -10,12 +11,16 @@ public class ShopManagementApplicationAutoMapperProfile : Profile
     {
         CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants))
-            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name)); ;
+            .ForMember(dest => dest.CategoryIds,
+                           opt => opt.MapFrom(src => src.ProductCategories.Select(pc => pc.CategoryId)))
+                .ForMember(dest => dest.Categories,
+                           opt => opt.MapFrom(src => src.ProductCategories.Select(pc => pc.Category)));
 
         CreateMap<ProductVariant, ProductVariantDto>();
 
         CreateMap<CreateUpdateProductDto, Product>()
-        .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants));
+        .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants))
+        .ForMember(dest => dest.ProductCategories, opt => opt.Ignore());
 
         CreateMap<CreateUpdateProductVariantDto, ProductVariant>();
 

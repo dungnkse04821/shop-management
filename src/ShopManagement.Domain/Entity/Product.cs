@@ -18,10 +18,7 @@ namespace ShopManagement.Entity
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-
-        public Guid CategoryId { get; set; }
-        public Category Category { get; set; } = null!;
-
+        public List<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
         public List<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
         public List<ProductImage> Images { get; set; } = new(); // thêm dòng này
 
@@ -36,7 +33,6 @@ namespace ShopManagement.Entity
             Description = description;
             PriceBuy = priceBuy;
             PriceSell = priceSell;
-            CategoryId = categoryId;
             CreatedAt = DateTime.Now;
             UpdatedAt = DateTime.Now;
             Variants = new List<ProductVariant>();

@@ -31,6 +31,7 @@ public class ShopManagementDbContext :
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -111,11 +112,6 @@ public class ShopManagementDbContext :
             b.HasMany(p => p.Images)
              .WithOne(pi => pi.Product)
              .HasForeignKey(pi => pi.ProductId);
-
-            b.HasOne(p => p.Category)
-             .WithMany(c => c.Products)
-             .HasForeignKey(p => p.CategoryId)
-             .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Category>(b =>
@@ -129,12 +125,19 @@ public class ShopManagementDbContext :
 
             b.Property(c => c.Description)
              .HasMaxLength(500);
+        });
 
-            // 1-n: Category → Products
-            b.HasMany(c => c.Products)
-             .WithOne(p => p.Category)
-             .HasForeignKey(p => p.CategoryId)
-             .OnDelete(DeleteBehavior.Restrict); // tránh xoá category gây xoá hết sản phẩm
+        modelBuilder.Entity<ProductCategory>(b =>
+        {
+            b.HasKey(pc => new { pc.ProductId, pc.CategoryId });
+
+            b.HasOne<Product>()
+             .WithMany(p => p.ProductCategories)
+             .HasForeignKey(pc => pc.ProductId);
+
+            b.HasOne<Category>()
+             .WithMany(c => c.ProductCategories)
+             .HasForeignKey(pc => pc.CategoryId);
         });
 
         modelBuilder.Entity<ProductVariant>(b =>
