@@ -131,13 +131,16 @@ public class ShopManagementDbContext :
         {
             b.HasKey(pc => new { pc.ProductId, pc.CategoryId });
 
-            b.HasOne<Product>()
-             .WithMany(p => p.ProductCategories)
-             .HasForeignKey(pc => pc.ProductId);
+            // tránh multiple cascade path bằng cách đặt delete behavior là Restrict
+            b.HasOne(pc => pc.Product)
+                .WithMany(p => p.ProductCategories)
+                .HasForeignKey(pc => pc.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            b.HasOne<Category>()
-             .WithMany(c => c.ProductCategories)
-             .HasForeignKey(pc => pc.CategoryId);
+            b.HasOne(pc => pc.Category)
+                .WithMany(c => c.ProductCategories)
+                .HasForeignKey(pc => pc.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ProductVariant>(b =>
